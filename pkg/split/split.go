@@ -53,7 +53,7 @@ func NewSplit() *Split {
 
 // SplitFile splits a file into multiple chunks of roughly equal size.
 // It creates chunks in the specified output directory and adds metadata to the first chunk.
-// The metadata includes a SHA-256 hash of the original file, which is used to verify
+// The metadata includes an SHA-256 hash of the original file, which is used to verify
 // data integrity during merging.
 //
 // Parameters:
@@ -158,7 +158,7 @@ func (s *Split) MergeFile(inDir string) error {
 	}
 	defer func() {
 		if closeErr := outFile.Close(); closeErr != nil {
-			// We can only log the error since we're in a defer
+			// We can only log the error since we're in a deferred
 			fmt.Printf("Error closing output file: %v\n", closeErr)
 		}
 	}()
@@ -181,10 +181,13 @@ func (s *Split) MergeFile(inDir string) error {
 
 		// Copy chunk data to an output file and calculate hash
 		if _, err := io.Copy(outFile, io.TeeReader(f, hash)); err != nil {
+			// Close the file before returning the error
+			_ = f.Close() // Ignore the close error since we're already handling another error
 			return fmt.Errorf("failed to copy chunk data: %w", err)
 		}
 
-		// Close the file explicitly to release resources sooner
+		// Close the file explicitly after processing to release resources immediately
+		// This is better than using defer inside a loop which would accumulate open files
 		if err := f.Close(); err != nil {
 			return fmt.Errorf("failed to close chunk file: %w", err)
 		}
@@ -250,7 +253,7 @@ func (s *Split) SplitData(v any, a []any, chunks int) error {
 			end = dataLength
 		}
 
-		// Skip empty chunks if data is smaller than number of chunks
+		// Skip empty chunks if data is smaller than the number of chunks
 		if start >= dataLength {
 			a[i] = []byte{}
 		} else {
@@ -296,41 +299,6 @@ func (s *Split) MergeData(a []any, v any) error {
 	return gob.NewDecoder(bytes.NewReader(combined)).Decode(v)
 }
 
-// The following functions are for future extension to support multiple serialization formats.
-// They are currently not used in the package.
-
-// encodeFormat encodes data using the specified format (gob or json).
-// func (s *Split) encodeFormat(v any, format string) ([]byte, error) {
-// 	var buf bytes.Buffer
-// 	switch strings.ToLower(format) {
-// 	case "gob":
-// 		if err := gob.NewEncoder(&buf).Encode(v); err != nil {
-// 			return nil, fmt.Errorf("gob encoding failed: %w", err)
-// 		}
-// 	case "json":
-// 		data, err := json.Marshal(v)
-// 		if err != nil {
-// 			return nil, fmt.Errorf("json encoding failed: %w", err)
-// 		}
-// 		buf.Write(data)
-// 	default:
-// 		return nil, fmt.Errorf("unsupported format: %s", format)
-// 	}
-// 	return buf.Bytes(), nil
-// }
-//
-// decodeFormat decodes data using the specified format (gob or json).
-// func (s *Split) decodeFormat(data []byte, v any, format string) error {
-// 	switch strings.ToLower(format) {
-// 	case "gob":
-// 		return gob.NewDecoder(bytes.NewReader(data)).Decode(v)
-// 	case "json":
-// 		return json.Unmarshal(data, v)
-// 	default:
-// 		return fmt.Errorf("unsupported format: %s", format)
-// 	}
-// }
-
 // parsedChunk represents a chunk file with its metadata
 type parsedChunk struct {
 	first bool   // indicates if this is the first chunk (contains metadata)
@@ -340,7 +308,7 @@ type parsedChunk struct {
 
 // injectMetadata adds metadata to the first chunk.
 // It creates a new file with metadata at the beginning, followed by the chunk data.
-// The original temporary file is removed after successful operation.
+// The original temporary file is removed after a successful operation.
 func (s *Split) injectMetadata(chunkPath string, meta *metadata) error {
 	src, err := os.Open(chunkPath)
 	if err != nil {
@@ -352,7 +320,7 @@ func (s *Split) injectMetadata(chunkPath string, meta *metadata) error {
 		}
 	}(src)
 
-	// Create destination file with .part extension
+	// Create a destination file with .part extension
 	dstName := strings.Replace(chunkPath, "tmp", "part", 1)
 	dst, err := os.Create(dstName)
 	if err != nil {
@@ -364,23 +332,23 @@ func (s *Split) injectMetadata(chunkPath string, meta *metadata) error {
 		}
 	}(dst)
 
-	// Write metadata to buffer
+	// Write metadata to a buffer
 	buf := new(bytes.Buffer)
 	if err := binary.Write(buf, binary.BigEndian, meta); err != nil {
 		return fmt.Errorf("failed to write metadata to buffer: %w", err)
 	}
 
-	// Write metadata to destination file
+	// Write metadata to a destination file
 	if _, err := dst.Write(buf.Bytes()); err != nil {
 		return fmt.Errorf("failed to write metadata to file: %w", err)
 	}
 
-	// Copy chunk data to destination file
+	// Copy chunk data to a destination file
 	if _, err := io.Copy(dst, src); err != nil {
 		return fmt.Errorf("failed to copy chunk data: %w", err)
 	}
 
-	// Remove temporary file
+	// Remove a temporary file
 	if err := os.Remove(chunkPath); err != nil {
 		return fmt.Errorf("failed to remove temporary file: %w", err)
 	}
