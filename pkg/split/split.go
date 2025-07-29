@@ -321,7 +321,11 @@ func (s *Split) injectMetadata(chunkPath string, meta *metadata) error {
 	}(src)
 
 	// Create a destination file with .part extension
-	dstName := strings.Replace(chunkPath, "tmp", "part", 1)
+	// Use filepath functions to ensure only the extension is replaced
+	dir := filepath.Dir(chunkPath)
+	base := filepath.Base(chunkPath)
+	baseWithoutExt := strings.TrimSuffix(base, filepath.Ext(base))
+	dstName := filepath.Join(dir, baseWithoutExt+".part")
 	dst, err := os.Create(dstName)
 	if err != nil {
 		return fmt.Errorf("failed to create destination file: %w", err)
