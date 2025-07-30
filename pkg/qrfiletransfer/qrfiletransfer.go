@@ -37,9 +37,9 @@ func NewQRFileTransfer() *QRFileTransfer {
 		splitter:         split.NewSplit(),
 		maxChunkSize:     2000, // Using a conservative value to ensure QR codes can be generated
 		recoveryLevel:    qrcode.Medium,
-		qrSize:           512,  // Default QR code size in pixels
-		minQRSize:        256,  // Minimum QR code size in pixels
-		maxQRSize:        1024, // Maximum QR code size in pixels
+		qrSize:           800,  // Default QR code size in pixels
+		minQRSize:        400,  // Minimum QR code size in pixels
+		maxQRSize:        1600, // Maximum QR code size in pixels
 		autoAdjustQRSize: true, // Enable automatic QR size adjustment by default
 	}
 }
