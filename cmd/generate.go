@@ -73,7 +73,7 @@ func init() {
 
 	// Add flags
 	generateCmd.Flags().StringVarP(&generateInputDir, "input", "i", "", "Input directory containing QR codes (required)")
-	generateCmd.Flags().IntVar(&generateVideoFPS, "fps", 2, "Frames per second for the generated video (default: 2)")
+	generateCmd.Flags().IntVar(&generateVideoFPS, "fps", 5, "Frames per second for the generated video (default: 2)")
 }
 
 // checkFFmpegInstalled checks if ffmpeg is installed on the system
@@ -114,7 +114,7 @@ func generateQRCodeVideo(qrDir, videoPath string, fps int) (err error) {
 
 	// Write the list of files to the temporary file
 	for _, file := range files {
-		// Use file's absolute path
+		// Use the file's absolute path
 		absPath, err := filepath.Abs(file)
 		if err != nil {
 			return fmt.Errorf("failed to get absolute path for %s: %w", file, err)
@@ -139,7 +139,7 @@ func generateQRCodeVideo(qrDir, videoPath string, fps int) (err error) {
 	// Build the ffmpeg command
 	cmd := exec.Command(
 		"ffmpeg",
-		"-y",           // Overwrite output file if it exists
+		"-y",           // Overwrite an output file if it exists
 		"-f", "concat", // Use concat demuxer
 		"-safe", "0", // Don't require safe filenames
 		"-i", tempFile.Name(), // Input file list
