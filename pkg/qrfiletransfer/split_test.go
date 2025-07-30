@@ -14,7 +14,11 @@ func TestSplitPackage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temporary directory: %v", err)
 	}
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Errorf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	// Convert to an absolute path
 	testDir, err = filepath.Abs(testDir)
@@ -42,7 +46,11 @@ func TestSplitPackage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to open test file: %v", err)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			t.Errorf("Failed to close file: %v", err)
+		}
+	}()
 
 	// Create a Split instance
 	s := split.NewSplit()

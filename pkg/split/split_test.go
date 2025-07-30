@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-const testDataDir = "testdata"
+const testDataDir = "../../testdata"
 
 func TestNewSplit(t *testing.T) {
 	s := NewSplit()

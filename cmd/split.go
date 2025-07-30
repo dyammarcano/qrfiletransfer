@@ -34,7 +34,9 @@ The QR codes can later be joined back into the original file using the join comm
 		// Validate input file
 		if splitInputFile == "" {
 			fmt.Println("Error: input file is required")
-			cmd.Help()
+			if err := cmd.Help(); err != nil {
+				fmt.Printf("Error displaying help: %v\n", err)
+			}
 			os.Exit(1)
 		}
 

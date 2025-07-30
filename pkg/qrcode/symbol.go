@@ -117,24 +117,24 @@ func (m *symbol) bitmap() [][]bool {
 
 // string returns a pictorial representation of the symbol, suitable for
 // printing in a TTY.
-func (m *symbol) string() string {
-	var result string
-
-	for _, row := range m.module {
-		for _, value := range row {
-			switch value {
-			case true:
-				result += "  "
-			case false:
-				// Unicode 'FULL BLOCK' (U+2588).
-				result += "██"
-			}
-		}
-		result += "\n"
-	}
-
-	return result
-}
+// func (m *symbol) string() string {
+// 	var result string
+//
+// 	for _, row := range m.module {
+// 		for _, value := range row {
+// 			switch value {
+// 			case true:
+// 				result += "  "
+// 			case false:
+// 				// Unicode 'FULL BLOCK' (U+2588).
+// 				result += "██"
+// 			}
+// 		}
+// 		result += "\n"
+// 	}
+//
+// 	return result
+// }
 
 // Constants used to weight penalty calculations. Specified by ISO/IEC
 // 18004:2006.

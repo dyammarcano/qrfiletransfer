@@ -12,7 +12,11 @@ func TestQRFileTransfer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temporary directory: %v", err)
 	}
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Errorf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	// Convert to an absolute path
 	testDir, err = filepath.Abs(testDir)

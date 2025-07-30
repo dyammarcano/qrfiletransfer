@@ -29,7 +29,9 @@ and save it as output_file.txt.`,
 		// Validate input directory
 		if joinInputDir == "" {
 			fmt.Println("Error: input directory is required")
-			cmd.Help()
+			if err := cmd.Help(); err != nil {
+				fmt.Printf("Error displaying help: %v\n", err)
+			}
 			os.Exit(1)
 		}
 
@@ -53,18 +55,16 @@ and save it as output_file.txt.`,
 			os.Exit(1)
 		}
 
-		// If output file is not specified, use a default
+		// If an output file is not specified, use a default
 		if joinOutputFile == "" {
 			// Use the input directory name as the output file name
 			baseName := filepath.Base(joinInputDir)
 			// Remove "_qrcodes" suffix if present
-			if strings.HasSuffix(baseName, "_qrcodes") {
-				baseName = baseName[:len(baseName)-len("_qrcodes")]
-			}
-			joinOutputFile = baseName + "_reconstructed"
+			baseName = strings.TrimPrefix(baseName, "_qrcodes")
+			joinOutputFile = fmt.Sprintf("%s_reconstructed", baseName)
 		}
 
-		// Create output directory if it doesn't exist
+		// Create an output directory if it doesn't exist
 		outputDir := filepath.Dir(joinOutputFile)
 		if outputDir != "." {
 			if err := os.MkdirAll(outputDir, 0755); err != nil {

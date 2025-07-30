@@ -222,7 +222,7 @@ func (d *dataEncoder) classifyDataModes() dataMode {
 	highestRequiredMode := mode
 
 	for i, v := range d.data {
-		newMode := dataModeNone
+		var newMode dataMode
 		switch {
 		case v >= 0x30 && v <= 0x39:
 			newMode = dataModeNumeric

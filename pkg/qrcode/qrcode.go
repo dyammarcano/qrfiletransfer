@@ -56,7 +56,6 @@ import (
 	"image/color"
 	"image/png"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -66,9 +65,10 @@ import (
 
 // Encode a QR Code and return a raw PNG image.
 //
-// size is both the image width and height in pixels. If size is too small then
+// size is both the image width and height in pixels. If the size is too small, then
 // a larger image is silently returned. Negative values for size cause a
-// variable sized image to be returned: See the documentation for Image().
+//
+//	variable-sized image to be returned: See the documentation for Image().
 //
 // To serve over HTTP, remember to send a Content-Type: image/png header.
 func Encode(content string, level RecoveryLevel, size int) ([]byte, error) {
@@ -217,7 +217,7 @@ func NewWithForcedVersion(content string, version int, level RecoveryLevel) (*QR
 	case version >= 27 && version <= 40:
 		encoder = newDataEncoder(dataEncoderType27To40)
 	default:
-		return nil, fmt.Errorf("Invalid version %d (expected 1-40 inclusive)", version)
+		return nil, fmt.Errorf("invalid version %d (expected 1-40 inclusive)", version)
 	}
 
 	var encoded *bitset.Bitset
@@ -234,7 +234,7 @@ func NewWithForcedVersion(content string, version int, level RecoveryLevel) (*QR
 	}
 
 	if encoded.Len() > chosenVersion.numDataBits() {
-		return nil, fmt.Errorf("Cannot encode QR code: content too large for fixed size QR Code version %d (encoded length is %d bits, maximum length is %d bits)",
+		return nil, fmt.Errorf("cannot encode QR code: content too large for fixed size QR Code version %d (encoded length is %d bits, maximum length is %d bits)",
 			version,
 			encoded.Len(),
 			chosenVersion.numDataBits())
@@ -357,14 +357,14 @@ func (q *QRCode) PNG(size int) ([]byte, error) {
 // a larger image is silently written. Negative values for size cause a
 // variable sized image to be written: See the documentation for Image().
 func (q *QRCode) Write(size int, out io.Writer) error {
-	var png []byte
+	var p []byte
 
-	png, err := q.PNG(size)
+	p, err := q.PNG(size)
 
 	if err != nil {
 		return err
 	}
-	_, err = out.Write(png)
+	_, err = out.Write(p)
 	return err
 }
 
@@ -374,15 +374,15 @@ func (q *QRCode) Write(size int, out io.Writer) error {
 // a larger image is silently written. Negative values for size cause a
 // variable sized image to be written: See the documentation for Image().
 func (q *QRCode) WriteFile(size int, filename string) error {
-	var png []byte
+	var p []byte
 
-	png, err := q.PNG(size)
+	p, err := q.PNG(size)
 
 	if err != nil {
 		return err
 	}
 
-	return ioutil.WriteFile(filename, png, os.FileMode(0644))
+	return os.WriteFile(filename, p, os.FileMode(0644))
 }
 
 // encode completes the steps required to encode the QR Code. These include
@@ -513,13 +513,13 @@ func (q *QRCode) encodeBlocks() *bitset.Bitset {
 }
 
 // max returns the maximum of a and b.
-func max(a int, b int) int {
-	if a > b {
-		return a
-	}
-
-	return b
-}
+// func max(a int, b int) int {
+// 	if a > b {
+// 		return a
+// 	}
+//
+// 	return b
+// }
 
 // addPadding pads the encoded data upto the full length required.
 func (q *QRCode) addPadding() {

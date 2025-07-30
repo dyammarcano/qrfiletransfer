@@ -29,11 +29,13 @@ The video will be saved in the same directory as "qrcodes_video.mp4".`,
 		// Validate input directory
 		if generateInputDir == "" {
 			fmt.Println("Error: input directory is required")
-			cmd.Help()
+			if err := cmd.Help(); err != nil {
+				fmt.Printf("Error displaying help: %v\n", err)
+			}
 			os.Exit(1)
 		}
 
-		// Check if input directory exists
+		// Check if the input directory exists
 		if _, err := os.Stat(generateInputDir); os.IsNotExist(err) {
 			fmt.Printf("Error: input directory '%s' does not exist\n", generateInputDir)
 			os.Exit(1)
@@ -84,7 +86,7 @@ func checkFFmpegInstalled() error {
 }
 
 // generateQRCodeVideo generates a video from QR code images using ffmpeg
-func generateQRCodeVideo(qrDir, videoPath string, fps int) error {
+func generateQRCodeVideo(qrDir, videoPath string, fps int) (err error) {
 	// Get all PNG files in the QR codes directory
 	files, err := filepath.Glob(filepath.Join(qrDir, "*.png"))
 	if err != nil {
@@ -103,7 +105,12 @@ func generateQRCodeVideo(qrDir, videoPath string, fps int) error {
 	if err != nil {
 		return fmt.Errorf("failed to create temporary file: %w", err)
 	}
-	defer os.Remove(tempFile.Name())
+	defer func() {
+		removeErr := os.Remove(tempFile.Name())
+		if removeErr != nil && err == nil {
+			err = fmt.Errorf("failed to remove temporary file: %w", removeErr)
+		}
+	}()
 
 	// Write the list of files to the temporary file
 	for _, file := range files {
@@ -113,12 +120,12 @@ func generateQRCodeVideo(qrDir, videoPath string, fps int) error {
 			return fmt.Errorf("failed to get absolute path for %s: %w", file, err)
 		}
 		// ffmpeg requires the file list to use the 'file' protocol
-		_, err = tempFile.WriteString(fmt.Sprintf("file '%s'\n", absPath))
+		_, err = fmt.Fprintf(tempFile, "file '%s'\n", absPath)
 		if err != nil {
 			return fmt.Errorf("failed to write to temporary file: %w", err)
 		}
 		// Set the duration for each image (in seconds)
-		_, err = tempFile.WriteString(fmt.Sprintf("duration %f\n", 1.0/float64(fps)))
+		_, err = fmt.Fprintf(tempFile, "duration %f\n", 1.0/float64(fps))
 		if err != nil {
 			return fmt.Errorf("failed to write to temporary file: %w", err)
 		}

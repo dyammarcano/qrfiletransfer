@@ -137,7 +137,12 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 	if err != nil {
 		return fmt.Errorf("failed to open file: %w", err)
 	}
-	defer file.Close()
+	defer func() {
+		closeErr := file.Close()
+		if closeErr != nil && err == nil {
+			err = fmt.Errorf("failed to close file: %w", closeErr)
+		}
+	}()
 
 	// Create a temporary directory for chunks
 	tempDir := filepath.Join(outDir, "temp")
@@ -271,13 +276,18 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 //   - outFilePath: Path to save the reconstructed file
 //
 // Returns an error if any part of the process fails.
-func (q *QRFileTransfer) QRCodesToFile(inDir string, outFilePath string) error {
+func (q *QRFileTransfer) QRCodesToFile(inDir string, outFilePath string) (err error) {
 	// Create a temporary directory for chunks
 	tempDir := filepath.Join(inDir, "temp")
 	if err := os.MkdirAll(tempDir, 0755); err != nil {
 		return fmt.Errorf("failed to create temporary directory: %w", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		removeErr := os.RemoveAll(tempDir)
+		if removeErr != nil && err == nil {
+			err = fmt.Errorf("failed to remove temporary directory: %w", removeErr)
+		}
+	}()
 
 	// Get all data files
 	dataDir := filepath.Join(inDir, "data")
@@ -340,13 +350,23 @@ func (q *QRFileTransfer) QRCodesToFile(inDir string, outFilePath string) error {
 	if err != nil {
 		return fmt.Errorf("failed to open reconstructed file: %w", err)
 	}
-	defer srcFile.Close()
+	defer func() {
+		closeErr := srcFile.Close()
+		if closeErr != nil && err == nil {
+			err = fmt.Errorf("failed to close source file: %w", closeErr)
+		}
+	}()
 
 	dstFile, err := os.Create(outFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to create output file: %w", err)
 	}
-	defer dstFile.Close()
+	defer func() {
+		closeErr := dstFile.Close()
+		if closeErr != nil && err == nil {
+			err = fmt.Errorf("failed to close destination file: %w", closeErr)
+		}
+	}()
 
 	if _, err := io.Copy(dstFile, srcFile); err != nil {
 		return fmt.Errorf("failed to copy reconstructed file: %w", err)
