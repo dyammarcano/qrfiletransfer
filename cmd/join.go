@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"awesomeProjectQrFileTransfer/pkg/qrfiletransfer"
 	"github.com/spf13/cobra"

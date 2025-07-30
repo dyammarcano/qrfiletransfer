@@ -8,13 +8,15 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "awesomeProjectQrFileTransfer",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "A tool to transfer files using QR codes",
+	Long: `QR File Transfer is a tool that allows you to transfer files using QR codes.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+You can split a file into multiple QR code images and later join those QR codes
+back into the original file. This is useful for transferring files between devices
+that don't have a direct connection but can scan QR codes.
+
+Use the 'split' command to split a file into QR codes, and the 'join' command
+to join QR codes back into a file.`,
 }
 
 func Execute() {
