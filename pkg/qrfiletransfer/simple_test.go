@@ -14,7 +14,7 @@ func TestSimpleFileCreation(t *testing.T) {
 	}
 	defer os.RemoveAll(testDir)
 
-	// Convert to absolute path
+	// Convert to an absolute path
 	testDir, err = filepath.Abs(testDir)
 	if err != nil {
 		t.Fatalf("Failed to get absolute path: %v", err)

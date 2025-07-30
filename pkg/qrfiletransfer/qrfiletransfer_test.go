@@ -14,7 +14,7 @@ func TestQRFileTransfer(t *testing.T) {
 	}
 	defer os.RemoveAll(testDir)
 
-	// Convert to absolute path
+	// Convert to an absolute path
 	testDir, err = filepath.Abs(testDir)
 	if err != nil {
 		t.Fatalf("Failed to get absolute path: %v", err)
@@ -29,8 +29,8 @@ func TestQRFileTransfer(t *testing.T) {
 		t.Fatalf("Failed to create test file: %v", err)
 	}
 
-	// Create output directory
-	outDir := filepath.Join(testDir, "output")
+	// Create an output directory
+	outDir := filepath.Join("testdata", "output")
 	if err := os.MkdirAll(outDir, 0755); err != nil {
 		t.Fatalf("Failed to create output directory: %v", err)
 	}
@@ -39,7 +39,7 @@ func TestQRFileTransfer(t *testing.T) {
 	qrft := NewQRFileTransfer()
 
 	// Set a small chunk size to ensure multiple chunks are created
-	qrft.maxChunkSize = 20
+	qrft.maxChunkSize = 10
 
 	// Convert the file to QR codes
 	if err := qrft.FileToQRCodes(testFilePath, outDir); err != nil {

@@ -1,12 +1,13 @@
 package main
 
 import (
-	"awesomeProjectQrFileTransfer/pkg/qrcode"
-	"awesomeProjectQrFileTransfer/pkg/qrfiletransfer"
 	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"awesomeProjectQrFileTransfer/pkg/qrcode"
+	"awesomeProjectQrFileTransfer/pkg/qrfiletransfer"
 )
 
 func main() {
@@ -32,9 +33,9 @@ func main() {
 	// Parse the appropriate command
 	switch os.Args[1] {
 	case "encode":
-		encodeCmd.Parse(os.Args[2:])
+		_ = encodeCmd.Parse(os.Args[2:])
 	case "decode":
-		decodeCmd.Parse(os.Args[2:])
+		_ = decodeCmd.Parse(os.Args[2:])
 	default:
 		fmt.Printf("Unknown command: %s\n", os.Args[1])
 		fmt.Println("Usage:")
@@ -43,7 +44,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Handle encode command
+	// Handle encodes command
 	if encodeCmd.Parsed() {
 		// Validate required flags
 		if *encodeInput == "" {
@@ -57,13 +58,13 @@ func main() {
 			os.Exit(1)
 		}
 
-		// Check if input file exists
+		// Check if an input file exists
 		if _, err := os.Stat(*encodeInput); os.IsNotExist(err) {
 			fmt.Printf("Error: Input file %s does not exist\n", *encodeInput)
 			os.Exit(1)
 		}
 
-		// Create output directory if it doesn't exist
+		// Create an output directory if it doesn't exist
 		if err := os.MkdirAll(*encodeOutput, 0755); err != nil {
 			fmt.Printf("Error creating output directory: %v\n", err)
 			os.Exit(1)
@@ -75,7 +76,7 @@ func main() {
 		// Set QR code size
 		qrft.SetQRSize(*encodeSize)
 
-		// Set recovery level
+		// Set a recovery level
 		var recoveryLevel qrcode.RecoveryLevel
 		switch *encodeRecovery {
 		case "low":
@@ -125,13 +126,13 @@ func main() {
 			os.Exit(1)
 		}
 
-		// Check if input directory exists
+		// Check if the input directory exists
 		if _, err := os.Stat(*decodeInput); os.IsNotExist(err) {
 			fmt.Printf("Error: Input directory %s does not exist\n", *decodeInput)
 			os.Exit(1)
 		}
 
-		// Create output directory if it doesn't exist
+		// Create an output directory if it doesn't exist
 		outputDir := filepath.Dir(*decodeOutput)
 		if err := os.MkdirAll(outputDir, 0755); err != nil {
 			fmt.Printf("Error creating output directory: %v\n", err)
@@ -141,7 +142,7 @@ func main() {
 		// Create QRFileTransfer instance
 		qrft := qrfiletransfer.NewQRFileTransfer()
 
-		// Reconstruct file from QR codes
+		// Reconstruct a file from QR codes
 		fmt.Printf("Reconstructing file from QR codes in %s...\n", *decodeInput)
 		if err := qrft.QRCodesToFile(*decodeInput, *decodeOutput); err != nil {
 			fmt.Printf("Error reconstructing file from QR codes: %v\n", err)

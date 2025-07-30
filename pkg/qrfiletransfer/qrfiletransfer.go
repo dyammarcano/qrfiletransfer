@@ -1,6 +1,7 @@
 package qrfiletransfer
 
 import (
+	"encoding/base64"
 	"fmt"
 	"io"
 	"os"
@@ -73,6 +74,11 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 	fileSize := fileInfo.Size()
 	numChunks := int(fileSize/int64(q.maxChunkSize)) + 1
 
+	// Ensure at least 2 chunks for small files
+	if numChunks < 2 {
+		numChunks = 2
+	}
+
 	// Split the file into chunks
 	if err := q.splitter.SplitFile(file, tempDir, numChunks); err != nil {
 		return fmt.Errorf("failed to split file: %w", err)
@@ -129,7 +135,10 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 		// Create a QR code from the chunk data
 		// For binary data, we need to use a string representation
 		// This is a limitation of the QR code package
-		qrCode, err := qrcode.New(fmt.Sprintf("Chunk: %s", baseNameWithoutExt), q.recoveryLevel)
+		// Encode the binary data as base64 string
+		encodedData := base64.StdEncoding.EncodeToString(chunkData)
+		qrContent := fmt.Sprintf("Chunk: %s\nData: %s", baseNameWithoutExt, encodedData)
+		qrCode, err := qrcode.New(qrContent, q.recoveryLevel)
 		if err != nil {
 			return fmt.Errorf("failed to create QR code for chunk %s: %w", chunkPath, err)
 		}
