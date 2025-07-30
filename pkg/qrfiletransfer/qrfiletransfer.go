@@ -23,15 +23,24 @@ type QRFileTransfer struct {
 	recoveryLevel qrcode.RecoveryLevel
 	// QR code size in pixels
 	qrSize int
+	// Minimum QR code size in pixels
+	minQRSize int
+	// Maximum QR code size in pixels
+	maxQRSize int
+	// Enable automatic QR size adjustment based on content
+	autoAdjustQRSize bool
 }
 
 // NewQRFileTransfer creates a new QRFileTransfer instance
 func NewQRFileTransfer() *QRFileTransfer {
 	return &QRFileTransfer{
-		splitter:      split.NewSplit(),
-		maxChunkSize:  2000, // Using a conservative value to ensure QR codes can be generated
-		recoveryLevel: qrcode.Medium,
-		qrSize:        512, // Default QR code size in pixels
+		splitter:         split.NewSplit(),
+		maxChunkSize:     2000, // Using a conservative value to ensure QR codes can be generated
+		recoveryLevel:    qrcode.Medium,
+		qrSize:           512,  // Default QR code size in pixels
+		minQRSize:        256,  // Minimum QR code size in pixels
+		maxQRSize:        1024, // Maximum QR code size in pixels
+		autoAdjustQRSize: true, // Enable automatic QR size adjustment by default
 	}
 }
 
@@ -43,6 +52,77 @@ func (q *QRFileTransfer) SetRecoveryLevel(level qrcode.RecoveryLevel) {
 // SetQRSize sets the QR code size in pixels
 func (q *QRFileTransfer) SetQRSize(size int) {
 	q.qrSize = size
+}
+
+// SetMinQRSize sets the minimum QR code size in pixels
+func (q *QRFileTransfer) SetMinQRSize(size int) {
+	q.minQRSize = size
+}
+
+// SetMaxQRSize sets the maximum QR code size in pixels
+func (q *QRFileTransfer) SetMaxQRSize(size int) {
+	q.maxQRSize = size
+}
+
+// SetAutoAdjustQRSize enables or disables automatic QR size adjustment
+func (q *QRFileTransfer) SetAutoAdjustQRSize(enable bool) {
+	q.autoAdjustQRSize = enable
+}
+
+// calculateOptimalQRSize calculates the optimal QR code size in pixels based on the chunk size
+// It estimates the QR code version based on the chunk size and then calculates an appropriate pixel size
+func (q *QRFileTransfer) calculateOptimalQRSize(chunkSize int) int {
+	// Base64 encoding increases the size by approximately 4/3
+	encodedSize := int(float64(chunkSize) * 1.34)
+
+	// Add some overhead for the chunk identifier and format
+	// "Chunk: name\nData: base64data"
+	encodedSize += 20
+
+	// Estimate QR code version based on data size and recovery level
+	// These are rough estimates based on QR code capacity
+	var estimatedVersion int
+
+	// Capacity in bytes for different versions with Medium recovery level
+	// Version 1: ~16 bytes, Version 10: ~271 bytes, Version 20: ~858 bytes, Version 30: ~1732 bytes, Version 40: ~2953 bytes
+	switch {
+	case encodedSize < 16:
+		estimatedVersion = 1
+	case encodedSize < 100:
+		estimatedVersion = 5
+	case encodedSize < 271:
+		estimatedVersion = 10
+	case encodedSize < 500:
+		estimatedVersion = 15
+	case encodedSize < 858:
+		estimatedVersion = 20
+	case encodedSize < 1300:
+		estimatedVersion = 25
+	case encodedSize < 1732:
+		estimatedVersion = 30
+	case encodedSize < 2300:
+		estimatedVersion = 35
+	default:
+		estimatedVersion = 40
+	}
+
+	// Calculate module size (number of modules in the QR code)
+	// Formula: 21 + (version-1)*4
+	moduleSize := 21 + (estimatedVersion-1)*4
+
+	// Calculate pixel size based on module size
+	// We want each module to be at least 2 pixels for readability
+	// But we also want to keep the QR code size reasonable
+	pixelSize := moduleSize * 4
+
+	// Ensure the size is within the min and max bounds
+	if pixelSize < q.minQRSize {
+		pixelSize = q.minQRSize
+	} else if pixelSize > q.maxQRSize {
+		pixelSize = q.maxQRSize
+	}
+
+	return pixelSize
 }
 
 // FileToQRCodes converts a file to a series of QR codes
@@ -72,12 +152,28 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 	}
 
 	fileSize := fileInfo.Size()
-	numChunks := int(fileSize/int64(q.maxChunkSize)) + 1
 
-	// Ensure at least 2 chunks for small files
-	if numChunks < 2 {
+	// Calculate number of chunks based on file size
+	// For larger files, we need more chunks to ensure each chunk is small enough for QR encoding
+	var numChunks int
+	switch {
+	case fileSize <= 1000:
+		// For small files, use at least 2 chunks
 		numChunks = 2
+	case fileSize <= 5000:
+		// For medium files, ensure chunks are around 1000 bytes or less
+		numChunks = int(fileSize/1000) + 1
+	case fileSize <= 20000:
+		// For larger files, ensure chunks are around 800 bytes or less
+		numChunks = int(fileSize/800) + 1
+	default:
+		// For very large files, ensure chunks are around 500 bytes or less
+		numChunks = int(fileSize/500) + 1
 	}
+
+	// Update maxChunkSize based on the calculated number of chunks
+	// This ensures that the chunks are properly sized for QR encoding
+	q.maxChunkSize = int(fileSize/int64(numChunks)) + 1
 
 	// Split the file into chunks
 	if err := q.splitter.SplitFile(file, tempDir, numChunks); err != nil {
@@ -143,8 +239,15 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 			return fmt.Errorf("failed to create QR code for chunk %s: %w", chunkPath, err)
 		}
 
+		// Determine the QR code size to use
+		qrSize := q.qrSize
+		if q.autoAdjustQRSize {
+			// Calculate optimal QR code size based on chunk size
+			qrSize = q.calculateOptimalQRSize(len(chunkData))
+		}
+
 		// Save the QR code to a file
-		if err := qrCode.WriteFile(q.qrSize, qrFilePath); err != nil {
+		if err := qrCode.WriteFile(qrSize, qrFilePath); err != nil {
 			return fmt.Errorf("failed to write QR code to file %s: %w", qrFilePath, err)
 		}
 
