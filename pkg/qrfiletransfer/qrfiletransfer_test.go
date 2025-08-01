@@ -8,10 +8,7 @@ import (
 
 func TestQRFileTransfer(t *testing.T) {
 	// Create a temporary directory for testing
-	testDir, err := os.MkdirTemp(os.TempDir(), "qrfiletransfer_test")
-	if err != nil {
-		t.Fatalf("Failed to create temporary directory: %v", err)
-	}
+	testDir := t.TempDir()
 
 	defer func() {
 		if err := os.RemoveAll(testDir); err != nil {
@@ -20,7 +17,7 @@ func TestQRFileTransfer(t *testing.T) {
 	}()
 
 	// Convert to an absolute path
-	testDir, err = filepath.Abs(testDir)
+	testDir, err := filepath.Abs(testDir)
 	if err != nil {
 		t.Fatalf("Failed to get absolute path: %v", err)
 	}
@@ -29,8 +26,10 @@ func TestQRFileTransfer(t *testing.T) {
 
 	// Create a test file
 	testFilePath := filepath.Join(testDir, "test.txt")
-	testContent := "This is a test file for QR file transfer. It contains some text that will be split into chunks and converted to QR codes."
-	if err := os.WriteFile(testFilePath, []byte(testContent), 0644); err != nil {
+	testContent := "This is a test file for QR file transfer. " +
+		"It contains some text that will be split into chunks and converted to QR codes."
+
+	if err := os.WriteFile(testFilePath, []byte(testContent), 0600); err != nil {
 		t.Fatalf("Failed to create test file: %v", err)
 	}
 
@@ -103,6 +102,7 @@ func TestQRFileTransfer(t *testing.T) {
 
 	// Check if the reconstructed content matches the original content
 	if string(reconstructedContent) != testContent {
-		t.Fatalf("Reconstructed content does not match original content.\nOriginal: %s\nReconstructed: %s", testContent, string(reconstructedContent))
+		t.Fatalf("Reconstructed content does not match original content.\nOriginal: %s\nReconstructed: %s",
+			testContent, string(reconstructedContent))
 	}
 }

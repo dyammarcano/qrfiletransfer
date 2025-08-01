@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"image"
 	_ "image/jpeg"
@@ -56,7 +57,7 @@ and reconstruct the original file.`,
 			baseName := filepath.Base(readInputVideo)
 			// Remove extension
 			baseName = strings.TrimSuffix(baseName, filepath.Ext(baseName))
-			readOutputFile = fmt.Sprintf("%s_reconstructed", baseName)
+			readOutputFile = baseName + "_reconstructed"
 		}
 
 		// Create an output directory if it doesn't exist
@@ -177,10 +178,14 @@ func init() {
 	rootCmd.AddCommand(readCmd)
 
 	// Add flags
-	readCmd.Flags().StringVarP(&readInputVideo, "input", "i", "", "Input video file containing QR codes (required)")
-	readCmd.Flags().StringVarP(&readOutputFile, "output", "o", "", "Output file path (default: <videoname>_reconstructed)")
-	readCmd.Flags().StringVarP(&readTempDir, "temp", "t", "", "Temporary directory for extracted frames (default: system temp)")
-	readCmd.Flags().BoolVarP(&readKeepFrames, "keep", "k", false, "Keep extracted frames and intermediate files")
+	readCmd.Flags().StringVarP(&readInputVideo, "input", "i", "",
+		"Input video file containing QR codes (required)")
+	readCmd.Flags().StringVarP(&readOutputFile, "output", "o", "",
+		"Output file path (default: <videoname>_reconstructed)")
+	readCmd.Flags().StringVarP(&readTempDir, "temp", "t", "",
+		"Temporary directory for extracted frames (default: system temp)")
+	readCmd.Flags().BoolVarP(&readKeepFrames, "keep", "k", false,
+		"Keep extracted frames and intermediate files")
 }
 
 // extractFramesFromVideo extracts frames from a video using ffmpeg.
@@ -203,7 +208,7 @@ func extractFramesFromVideo(videoPath, outputDir string) error {
 	return nil
 }
 
-// readQRCodesFromFrames reads QR codes from image frames and saves the data
+// readQRCodesFromFrames reads QR codes from image frames and saves the data.
 func readQRCodesFromFrames(framesDir, dataDir string) error {
 	// Get all PNG files in the frames directory
 	frames, err := filepath.Glob(filepath.Join(framesDir, "*.png"))
@@ -228,16 +233,18 @@ func readQRCodesFromFrames(framesDir, dataDir string) error {
 		if err != nil {
 			// Just log the error and continue with the next frame
 			fmt.Printf("Warning: failed to read QR code from frame %s: %v\n", framePath, err)
+
 			continue
 		}
 
 		// Generate a simple hash of the data to detect duplicates
 		// This is a simple approach - in a production system, you might want to use a more robust method
-		dataHash := fmt.Sprintf("%x", data[:minV(len(data), 20)])
+		dataHash := hex.EncodeToString(data[:minV(len(data), 20)])
 
 		// Skip if we've already processed this chunk (duplicate frame)
 		if processedChunks[dataHash] {
 			fmt.Printf("Info: skipping duplicate QR code in frame %s\n", framePath)
+
 			continue
 		}
 
@@ -260,18 +267,20 @@ func readQRCodesFromFrames(framesDir, dataDir string) error {
 	}
 
 	fmt.Printf("Successfully extracted %d unique QR codes from %d frames\n", processedFrames, len(frames))
+
 	return nil
 }
 
-// minV returns the minimum of two integers
+// minV returns the minimum of two integers.
 func minV(a, b int) int {
 	if a < b {
 		return a
 	}
+
 	return b
 }
 
-// copyFile copies a file from src to dst
+// copyFile copies a file from src to dst.
 func copyFile(src, dst string) error {
 	// Read the source file
 	data, err := os.ReadFile(src)

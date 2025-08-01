@@ -86,7 +86,10 @@ func (s *Split) SplitFile(file *os.File, outDir string, chunks int) error {
 		Total: uint32(chunks),
 		Time:  time.Now().Unix(),
 		Size:  fileSize,
+		Name:  [MaxFilenameLength]byte{},
+		Hash:  [32]byte{},
 	}
+
 	copy(meta.Name[:], nameBase)
 
 	var firstChunk string
@@ -112,8 +115,10 @@ func (s *Split) SplitFile(file *os.File, outDir string, chunks int) error {
 		if err != nil {
 			if err == io.EOF {
 				copy(meta.Hash[:], hash.Sum(nil))
+
 				return s.injectMetadata(firstChunk, &meta)
 			}
+
 			return fmt.Errorf("error reading file: %w", err)
 		}
 	}
@@ -151,6 +156,7 @@ func (s *Split) MergeFile(inDir string) error {
 			}
 
 			foundFirstChunk = true
+
 			break
 		}
 	}
@@ -194,6 +200,7 @@ func (s *Split) MergeFile(inDir string) error {
 		if _, err := io.Copy(outFile, io.TeeReader(f, hash)); err != nil {
 			// Close the file before returning the error
 			_ = f.Close() // Ignore the close error since we're already handling another error
+
 			return fmt.Errorf("failed to copy chunk data: %w", err)
 		}
 
@@ -217,6 +224,7 @@ func (s *Split) MergeFile(inDir string) error {
 	}
 
 	fmt.Printf("Merge successful. File saved as: %s\n", outputFileName)
+
 	return nil
 }
 
@@ -313,8 +321,11 @@ func (s *Split) MergeData(a []any, v any) error {
 		return errors.New("no data to decode")
 	}
 
-	dec := gob.NewDecoder(bytes.NewReader(combined))
-	return dec.Decode(v)
+	if err := gob.NewDecoder(bytes.NewReader(combined)).Decode(v); err != nil {
+		return fmt.Errorf("gob.Decode failed: %w", err)
+	}
+
+	return nil
 }
 
 // parsedChunk represents a chunk file with its metadata
@@ -407,7 +418,8 @@ func (s *Split) checkFiles(dir string) ([]parsedChunk, error) {
 		return nil, fmt.Errorf("failed to read directory: %w", err)
 	}
 
-	var chunks []parsedChunk
+	chunks := make([]parsedChunk, 0)
+
 	re := regexp.MustCompile(`_(\d{4})\.part$`)
 
 	for _, e := range entries {
@@ -416,6 +428,7 @@ func (s *Split) checkFiles(dir string) ([]parsedChunk, error) {
 		}
 
 		name := filepath.Join(dir, e.Name())
+
 		m := re.FindStringSubmatch(e.Name())
 		if len(m) != 2 {
 			continue
@@ -424,6 +437,7 @@ func (s *Split) checkFiles(dir string) ([]parsedChunk, error) {
 		var idx int
 		if _, scanErr := fmt.Sscanf(m[1], "%d", &idx); scanErr != nil {
 			fmt.Printf("Warning: failed to parse chunk index from %s: %v\n", e.Name(), scanErr)
+
 			continue
 		}
 

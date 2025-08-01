@@ -84,7 +84,8 @@ func (q *QRFileTransfer) calculateOptimalQRSize(chunkSize int) int {
 	var estimatedVersion int
 
 	// Capacity in bytes for different versions with Medium recovery level
-	// Version 1: ~16 bytes, Version 10: ~271 bytes, Version 20: ~858 bytes, Version 30: ~1732 bytes, Version 40: ~2953 bytes
+	// Version 1: ~16 bytes, Version 10: ~271 bytes, Version 20: ~858 bytes,
+	// Version 30: ~1732 bytes, Version 40: ~2953 bytes
 	switch {
 	case encodedSize < 16:
 		estimatedVersion = 1
@@ -151,7 +152,7 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 		return fmt.Errorf("failed to create temporary directory: %w", err)
 	}
 
-	// Calculate number of chunks based on file size and max chunk size
+	// Calculate the number of chunks based on file size and max chunk size
 	fileInfo, err := file.Stat()
 	if err != nil {
 		return fmt.Errorf("failed to get file info: %w", err)
@@ -159,8 +160,8 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 
 	fileSize := fileInfo.Size()
 
-	// Calculate number of chunks based on file size
-	// For larger files, we need more chunks to ensure each chunk is small enough for QR encoding
+	// Calculate the number of chunks based on file size
+	// For larger files; we need more chunks to ensure each chunk is small enough for QR encoding
 	var numChunks int
 
 	switch {
@@ -187,15 +188,15 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 		return fmt.Errorf("failed to split file: %w", err)
 	}
 
-	// Create output directory for QR codes
+	// Create an output directory for QR codes
 	qrDir := filepath.Join(outDir, "qrcodes")
-	if err := os.MkdirAll(qrDir, 0755); err != nil {
+	if err := os.MkdirAll(qrDir, 0750); err != nil {
 		return fmt.Errorf("failed to create QR codes directory: %w", err)
 	}
 
-	// Create output directory for raw data
+	// Create an output directory for raw data
 	dataDir := filepath.Join(outDir, "data")
-	if err := os.MkdirAll(dataDir, 0755); err != nil {
+	if err := os.MkdirAll(dataDir, 0750); err != nil {
 		return fmt.Errorf("failed to create data directory: %w", err)
 	}
 
@@ -227,11 +228,11 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 		baseName := filepath.Base(chunkPath)
 		baseNameWithoutExt := strings.TrimSuffix(baseName, filepath.Ext(baseName))
 
-		// Create QR code file name with the same naming convention
+		// Create a QR code file name with the same naming convention
 		qrFileName := baseNameWithoutExt + ".png"
 		qrFilePath := filepath.Join(qrDir, qrFileName)
 
-		// Create data file name with the same naming convention
+		// Create a data file name with the same naming convention
 		dataFileName := baseNameWithoutExt + ".dat"
 		dataFilePath := filepath.Join(dataDir, dataFileName)
 
@@ -260,7 +261,7 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 		}
 
 		// Save the raw data to a file
-		if err := os.WriteFile(dataFilePath, chunkData, 0644); err != nil {
+		if err := os.WriteFile(dataFilePath, chunkData, 0600); err != nil {
 			return fmt.Errorf("failed to write data to file %s: %w", dataFilePath, err)
 		}
 	}
@@ -322,7 +323,7 @@ func (q *QRFileTransfer) QRCodesToFile(inDir string, outFilePath string) (err er
 		chunkFilePath := filepath.Join(tempDir, baseNameWithoutExt+".part")
 
 		// Write the chunk data to a file
-		if err := os.WriteFile(chunkFilePath, chunkData, 0644); err != nil {
+		if err := os.WriteFile(chunkFilePath, chunkData, 0600); err != nil {
 			return fmt.Errorf("failed to write chunk to file %s: %w", chunkFilePath, err)
 		}
 	}
@@ -343,6 +344,7 @@ func (q *QRFileTransfer) QRCodesToFile(inDir string, outFilePath string) (err er
 	for _, file := range files {
 		if !file.IsDir() && !strings.HasSuffix(file.Name(), ".part") && !strings.HasSuffix(file.Name(), ".tmp") {
 			reconstructedFile = filepath.Join(tempDir, file.Name())
+
 			break
 		}
 	}

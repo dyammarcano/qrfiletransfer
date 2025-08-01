@@ -28,7 +28,7 @@ and save it as output_file.txt.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Validate input directory
 		if joinInputDir == "" {
-			fmt.Println("Error: input directory is required")
+			cmd.Println("Error: input directory is required")
 			if err := cmd.Help(); err != nil {
 				fmt.Printf("Error displaying help: %v\n", err)
 			}
@@ -37,21 +37,21 @@ and save it as output_file.txt.`,
 
 		// Check if the input directory exists
 		if _, err := os.Stat(joinInputDir); os.IsNotExist(err) {
-			fmt.Printf("Error: input directory '%s' does not exist\n", joinInputDir)
+			cmd.Printf("Error: input directory '%s' does not exist\n", joinInputDir)
 			os.Exit(1)
 		}
 
 		// Check if the qrcodes directory exists inside the input directory
 		qrcodesDir := filepath.Join(joinInputDir, "qrcodes")
 		if _, err := os.Stat(qrcodesDir); os.IsNotExist(err) {
-			fmt.Printf("Error: QR codes directory '%s' does not exist\n", qrcodesDir)
+			cmd.Printf("Error: QR codes directory '%s' does not exist\n", qrcodesDir)
 			os.Exit(1)
 		}
 
 		// Check if the data directory exists inside the input directory
 		dataDir := filepath.Join(joinInputDir, "data")
 		if _, err := os.Stat(dataDir); os.IsNotExist(err) {
-			fmt.Printf("Error: data directory '%s' does not exist\n", dataDir)
+			cmd.Printf("Error: data directory '%s' does not exist\n", dataDir)
 			os.Exit(1)
 		}
 
@@ -61,14 +61,14 @@ and save it as output_file.txt.`,
 			baseName := filepath.Base(joinInputDir)
 			// Remove "_qrcodes" suffix if present
 			baseName = strings.TrimPrefix(baseName, "_qrcodes")
-			joinOutputFile = fmt.Sprintf("%s_reconstructed", baseName)
+			joinOutputFile = baseName + "_reconstructed"
 		}
 
 		// Create an output directory if it doesn't exist
 		outputDir := filepath.Dir(joinOutputFile)
 		if outputDir != "." {
 			if err := os.MkdirAll(outputDir, 0755); err != nil {
-				fmt.Printf("Error creating output directory: %v\n", err)
+				cmd.Printf("Error creating output directory: %v\n", err)
 				os.Exit(1)
 			}
 		}
@@ -77,13 +77,13 @@ and save it as output_file.txt.`,
 		qrft := qrfiletransfer.NewQRFileTransfer()
 
 		// Join the QR codes into a file
-		fmt.Printf("Joining QR codes from directory '%s' into file '%s'...\n", joinInputDir, joinOutputFile)
+		cmd.Printf("Joining QR codes from directory '%s' into file '%s'...\n", joinInputDir, joinOutputFile)
 		if err := qrft.QRCodesToFile(joinInputDir, joinOutputFile); err != nil {
-			fmt.Printf("Error joining QR codes: %v\n", err)
+			cmd.Printf("Error joining QR codes: %v\n", err)
 			os.Exit(1)
 		}
 
-		fmt.Printf("Successfully joined QR codes into file '%s'\n", joinOutputFile)
+		cmd.Printf("Successfully joined QR codes into file '%s'\n", joinOutputFile)
 	},
 }
 

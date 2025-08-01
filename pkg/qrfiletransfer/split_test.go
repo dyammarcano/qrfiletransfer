@@ -10,10 +10,7 @@ import (
 
 func TestSplitPackage(t *testing.T) {
 	// Create a temporary directory for testing
-	testDir, err := os.MkdirTemp(os.TempDir(), "split_test")
-	if err != nil {
-		t.Fatalf("Failed to create temporary directory: %v", err)
-	}
+	testDir := t.TempDir()
 
 	defer func() {
 		if err := os.RemoveAll(testDir); err != nil {
@@ -22,7 +19,7 @@ func TestSplitPackage(t *testing.T) {
 	}()
 
 	// Convert to an absolute path
-	testDir, err = filepath.Abs(testDir)
+	testDir, err := filepath.Abs(testDir)
 	if err != nil {
 		t.Fatalf("Failed to get absolute path: %v", err)
 	}
@@ -96,6 +93,7 @@ func TestSplitPackage(t *testing.T) {
 
 	// Check if the reconstructed content matches the original content
 	if string(reconstructedContent) != testContent {
-		t.Fatalf("Reconstructed content does not match original content.\nOriginal: %s\nReconstructed: %s", testContent, string(reconstructedContent))
+		t.Fatalf("Reconstructed content does not match original content.\nOriginal: %s\nReconstructed: %s",
+			testContent, string(reconstructedContent))
 	}
 }

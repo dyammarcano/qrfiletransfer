@@ -96,6 +96,7 @@ Stack Statistics:
 		file, err := os.Create(filepath.Join(outputDir, fmt.Sprintf("%s.json", testName)))
 		if err != nil {
 			t.Logf("Failed to save profile: %v", err)
+
 			return
 		}
 		defer func(file *os.File) {

@@ -329,7 +329,8 @@ func TestSymbolPenalties(t *testing.T) {
 		}
 
 		if !ok {
-			t.Fatalf("Penalty test #%d p1=%d, p2=%d, p3=%d, p4=%d (expected p1=%d, p2=%d, p3=%d, p4=%d)", i, penalty1, penalty2, penalty3, penalty4,
+			t.Fatalf("Penalty test #%d p1=%d, p2=%d, p3=%d, p4=%d (expected p1=%d, p2=%d, p3=%d, p4=%d)",
+				i, penalty1, penalty2, penalty3, penalty4,
 				test.expectedPenalty1, test.expectedPenalty2, test.expectedPenalty3,
 				test.expectedPenalty4)
 		}

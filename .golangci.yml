@@ -7,15 +7,14 @@ run:
 
 linters-settings:
   revive:
+    exclude:
+      - test-package
+      - package-comments
+      - unnecessary-init
+      - var-declaration
+      - builtin-shadow
+      - varnamelen
     rules:
-      - name: package-comments
-        disabled: true
-      - name: unnecessary-init
-        disabled: true
-      - name: var-declaration
-        disabled: true
-      - name: builtin-shadow
-        disabled: true
       - name: varnamelen
         arguments: [1]
 
@@ -54,3 +53,13 @@ linters:
     - unparam
     - unused
     - whitespace
+  disable:
+    - tagliatelle
+    - gochecknoglobals
+    - mnd
+    - testpackage
+    - varnamelen
+    - revive
+    - paralleltest
+    - gochecknoinits
+    - funlen

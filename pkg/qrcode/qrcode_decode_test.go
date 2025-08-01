@@ -73,9 +73,7 @@ func TestDecodeBasic(t *testing.T) {
 			t.Error(err.Error())
 		}
 
-		err = zbarimgCheck(q)
-
-		if err != nil {
+		if err = zbarimgCheck(q); err != nil {
 			t.Error(err.Error())
 		}
 	}
@@ -88,24 +86,18 @@ func TestDecodeAllVersionLevels(t *testing.T) {
 
 	for version := 1; version <= 40; version++ {
 		for _, level := range []RecoveryLevel{Low, Medium, High, Highest} {
-			t.Logf("Version=%d Level=%d",
-				version,
-				level)
+			t.Logf("Version=%d Level=%d", version, level)
 
-			q, err := NewWithForcedVersion(
-				fmt.Sprintf("v-%d l-%d", version, level), version, level)
+			q, err := NewWithForcedVersion(fmt.Sprintf("v-%d l-%d", version, level), version, level)
 			if err != nil {
 				t.Fatal(err.Error())
+
 				return
 			}
 
-			err = zbarimgCheck(q)
+			if err := zbarimgCheck(q); err != nil {
+				t.Errorf("Version=%d Level=%d, err=%s, expected success", version, level, err.Error())
 
-			if err != nil {
-				t.Errorf("Version=%d Level=%d, err=%s, expected success",
-					version,
-					level,
-					err.Error())
 				continue
 			}
 		}
@@ -196,8 +188,7 @@ func zbarimgDecode(q *QRCode) (string, error) {
 		return "", err
 	}
 
-	cmd := exec.Command("zbarimg", "--quiet", "-Sdisable",
-		"-Sqrcode.enable", "-")
+	cmd := exec.Command("zbarimg", "--quiet", "-Sdisable", "-Sqrcode.enable", "-")
 
 	var out bytes.Buffer
 
@@ -222,9 +213,7 @@ func BenchmarkDecodeTest(b *testing.B) {
 			b.Error(err.Error())
 		}
 
-		err = zbarimgCheck(q)
-
-		if err != nil {
+		if err = zbarimgCheck(q); err != nil {
 			b.Error(err.Error())
 		}
 	}

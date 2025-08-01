@@ -35,6 +35,7 @@ func TestExampleEncodeWithColourAndWithoutBorder(t *testing.T) {
 	q, err := New("https://example.org", Medium)
 	if err != nil {
 		t.Errorf("Error: %s", err)
+
 		return
 	}
 
@@ -48,6 +49,7 @@ func TestExampleEncodeWithColourAndWithoutBorder(t *testing.T) {
 	err = q.WriteFile(256, "example2.png")
 	if err != nil {
 		t.Errorf("Error: %s", err)
+
 		return
 	}
 }

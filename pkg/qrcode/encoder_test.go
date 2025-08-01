@@ -365,6 +365,7 @@ func TestOptimiseEncoding(t *testing.T) {
 					if encoder.optimised[i].dataMode != s.dataMode ||
 						len(encoder.optimised[i].data) != s.numChars {
 						ok = false
+
 						break
 					}
 				}

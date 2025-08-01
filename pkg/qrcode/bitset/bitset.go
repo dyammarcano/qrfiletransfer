@@ -50,7 +50,7 @@ func New(v ...bool) *Bitset {
 
 // Clone returns a copy.
 func Clone(from *Bitset) *Bitset {
-	return &Bitset{numBits: from.numBits, bits: from.bits[:]}
+	return &Bitset{numBits: from.numBits, bits: from.bits}
 }
 
 // Substr returns a substring, consisting of the bits from indexes start to end.

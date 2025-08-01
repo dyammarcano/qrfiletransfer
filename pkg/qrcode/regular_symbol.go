@@ -224,7 +224,7 @@ func (m *regularSymbol) addVersionInfo() {
 	}
 
 	for i := 0; i < v.Len(); i++ {
-		// Above the bottom left finder pattern.
+		// Above, the bottom left finder pattern.
 		m.symbol.set(i/3, m.size-fpSize-4+i%3, v.At(l-i))
 
 		// Left of the top right finder pattern.
@@ -274,7 +274,7 @@ func (m *regularSymbol) addData() (bool, error) {
 			break
 		}
 
-		// Find next free bit in the symbol.
+		// Find the next free bit in the symbol.
 		for {
 			if xOffset == 1 {
 				xOffset = 0

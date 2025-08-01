@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -28,7 +29,7 @@ The video will be saved in the same directory as "qrcodes_video.mp4".`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Validate input directory
 		if generateInputDir == "" {
-			fmt.Println("Error: input directory is required")
+			cmd.Println("Error: input directory is required")
 			if err := cmd.Help(); err != nil {
 				fmt.Printf("Error displaying help: %v\n", err)
 			}
@@ -37,7 +38,7 @@ The video will be saved in the same directory as "qrcodes_video.mp4".`,
 
 		// Check if the input directory exists
 		if _, err := os.Stat(generateInputDir); os.IsNotExist(err) {
-			fmt.Printf("Error: input directory '%s' does not exist\n", generateInputDir)
+			cmd.Printf("Error: input directory '%s' does not exist\n", generateInputDir)
 			os.Exit(1)
 		}
 
@@ -49,22 +50,22 @@ The video will be saved in the same directory as "qrcodes_video.mp4".`,
 			qrDir = qrcodesSubdir
 		}
 
-		fmt.Println("Generating video from QR codes...")
+		cmd.Println("Generating video from QR codes...")
 
 		// Check if ffmpeg is installed
 		if err := checkFFmpegInstalled(); err != nil {
-			fmt.Printf("Error: %v\n", err)
+			cmd.Printf("Error: %v\n", err)
 			os.Exit(1)
 		}
 
 		// Generate video from QR codes
 		videoPath := filepath.Join(filepath.Dir(qrDir), "qrcodes_video.mp4")
 		if err := generateQRCodeVideo(qrDir, videoPath, generateVideoFPS); err != nil {
-			fmt.Printf("Error generating video: %v\n", err)
+			cmd.Printf("Error generating video: %v\n", err)
 			os.Exit(1)
 		}
 
-		fmt.Printf("Successfully generated video: %s\n", videoPath)
+		cmd.Printf("Successfully generated video: %s\n", videoPath)
 	},
 }
 
@@ -80,8 +81,9 @@ func init() {
 func checkFFmpegInstalled() error {
 	cmd := exec.Command("ffmpeg", "-version")
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("ffmpeg is not installed or not in PATH. Please install ffmpeg to use the video generation feature")
+		return errors.New("ffmpeg is not installed or not in PATH. Please install ffmpeg to use the video generation feature")
 	}
+
 	return nil
 }
 

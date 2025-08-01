@@ -2968,12 +2968,15 @@ func chooseQRCodeVersion(level RecoveryLevel, encoder *dataEncoder, numDataBits 
 	var chosenVersion *qrCodeVersion
 
 	for _, v := range versions {
-		switch {
-		case v.level != level:
+		if v.level != level {
 			continue
-		case v.version < encoder.minVersion:
+		}
+
+		if v.version < encoder.minVersion {
 			continue
-		case v.version > encoder.maxVersion:
+		}
+
+		if v.version > encoder.maxVersion {
 			break
 		}
 
@@ -2981,6 +2984,7 @@ func chooseQRCodeVersion(level RecoveryLevel, encoder *dataEncoder, numDataBits 
 
 		if numFreeBits >= 0 {
 			chosenVersion = &v
+
 			break
 		}
 	}
@@ -3015,7 +3019,7 @@ func (v qrCodeVersion) numBlocks() int {
 }
 
 // numBitsToPadToCodeword returns the number of bits required to pad data of
-// length numDataBits upto the nearest codeword size.
+// length numDataBits up to the nearest codeword size.
 func (v qrCodeVersion) numBitsToPadToCodeword(numDataBits int) int {
 	if numDataBits == v.numDataBits() {
 		return 0

@@ -74,18 +74,20 @@ func CompareWithGoldenFile(t *testing.T, goldenFilePath string, actualContent st
 	dir := filepath.Dir(goldenFilePath)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		t.Fatalf("Failed to create directory for golden file: %v", err)
+
 		return false
 	}
 
-	// If update flag is set, update the golden file
+	// If an update flag is set, update the golden file
 	if update {
-		err := os.WriteFile(goldenFilePath, []byte(actualContent), 0644)
-		if err != nil {
+		if err := os.WriteFile(goldenFilePath, []byte(actualContent), 0644); err != nil {
 			t.Fatalf("Failed to update golden file: %v", err)
+
 			return false
 		}
 
 		t.Logf("Updated golden file: %s", goldenFilePath)
+
 		return true
 	}
 
@@ -93,6 +95,7 @@ func CompareWithGoldenFile(t *testing.T, goldenFilePath string, actualContent st
 	expectedContent, err := os.ReadFile(goldenFilePath)
 	if err != nil {
 		t.Fatalf("Failed to read golden file: %v", err)
+
 		return false
 	}
 
@@ -104,15 +107,15 @@ func CompareWithGoldenFile(t *testing.T, goldenFilePath string, actualContent st
 		normalizedExpected := normalizeSystemdUnitContent(string(expectedContent))
 		normalizedActual := normalizeSystemdUnitContent(actualContent)
 
-		require.Equal(t, normalizedExpected, normalizedActual,
-			fmt.Sprintf("Content does not match golden file (after normalization): %s", goldenFilePath))
+		require.Equalf(t, normalizedExpected, normalizedActual,
+			"Content does not match golden file (after normalization): %s", goldenFilePath)
 
 		return normalizedExpected == normalizedActual
 	}
 
 	// For other file types, compare the content directly
-	require.Equal(t, string(expectedContent), actualContent,
-		fmt.Sprintf("Content does not match golden file: %s", goldenFilePath))
+	require.Equalf(t, string(expectedContent), actualContent,
+		"Content does not match golden file: %s", goldenFilePath)
 
 	return string(expectedContent) == actualContent
 }
@@ -148,6 +151,7 @@ func UpdateGoldenFile(t *testing.T, goldenFilePath string, content string) error
 	}
 
 	t.Logf("Updated golden file: %s", goldenFilePath)
+
 	return nil
 }
 
@@ -158,6 +162,7 @@ func AssertFileMatchesGolden(t *testing.T, afs afero.Fs, actualPath string, gold
 	actualContent, err := afero.ReadFile(afs, actualPath)
 	if err != nil {
 		t.Fatalf("Failed to read actual file: %v", err)
+
 		return
 	}
 
@@ -165,10 +170,10 @@ func AssertFileMatchesGolden(t *testing.T, afs afero.Fs, actualPath string, gold
 	goldenContent, err := afero.ReadFile(afs, goldenPath)
 	if err != nil {
 		t.Fatalf("Failed to read golden file: %v", err)
+
 		return
 	}
 
 	// Compare the contents
-	require.Equal(t, string(goldenContent), string(actualContent),
-		fmt.Sprintf("Content does not match golden file: %s", goldenPath))
+	require.Equalf(t, string(goldenContent), string(actualContent), "Content does not match golden file: %s", goldenPath)
 }

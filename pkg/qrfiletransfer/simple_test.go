@@ -8,10 +8,7 @@ import (
 
 func TestSimpleFileCreation(t *testing.T) {
 	// Create a temporary directory for testing
-	testDir, err := os.MkdirTemp(os.TempDir(), "simple_test")
-	if err != nil {
-		t.Fatalf("Failed to create temporary directory: %v", err)
-	}
+	testDir := t.TempDir()
 
 	defer func() {
 		if err := os.RemoveAll(testDir); err != nil {
@@ -20,7 +17,7 @@ func TestSimpleFileCreation(t *testing.T) {
 	}()
 
 	// Convert to an absolute path
-	testDir, err = filepath.Abs(testDir)
+	testDir, err := filepath.Abs(testDir)
 	if err != nil {
 		t.Fatalf("Failed to get absolute path: %v", err)
 	}
