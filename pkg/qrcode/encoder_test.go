@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	bitset "awesomeProjectQrFileTransfer/pkg/qrcode/bitset"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrcode/bitset"
 )
 
 func TestClassifyDataMode(t *testing.T) {
@@ -50,6 +50,7 @@ func TestClassifyDataMode(t *testing.T) {
 
 	for _, test := range tests {
 		encoder := newDataEncoder(dataEncoderType1To9)
+
 		_, err := encoder.encode(test.data)
 		if err != nil {
 			t.Fatalf("Failed to encode data: %v", err)
@@ -71,6 +72,7 @@ func TestByteModeLengthCalculations(t *testing.T) {
 
 	for i, test := range tests {
 		encoder := newDataEncoder(test.dataEncoderType)
+
 		var resultLength int
 
 		resultLength, err := encoder.encodedLength(test.dataMode, test.numSymbols)
@@ -329,6 +331,7 @@ func TestOptimiseEncoding(t *testing.T) {
 		data := make([]byte, numTotalChars)
 
 		i := 0
+
 		for _, v := range test.actual {
 			for j := 0; j < v.numChars; j++ {
 				switch v.dataMode {

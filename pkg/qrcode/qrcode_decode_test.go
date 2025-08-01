@@ -18,14 +18,13 @@ import (
 // http://zbar.sourceforge.net.
 //
 // By default these tests are disabled to avoid a dependency on zbarimg if
-// you're not running the tests. Use the -test-decode flag (go test
-// -test-decode) to enable.
+// you're not running the tests. Use the -test-decode flag (go test -test-decode) to enable.
 
 var testDecode *bool = flag.Bool("test-decode",
 	false,
 	"Enable decode tests. Requires zbarimg installed.")
 
-var testDecodeFuzz *bool = flag.Bool("test-decode-fuzz",
+var testDecodeFuzz = flag.Bool("test-decode-fuzz",
 	false,
 	"Enable decode fuzz tests. Requires zbarimg installed.")
 
@@ -144,8 +143,10 @@ func TestDecodeFuzz(t *testing.T) {
 
 	r := rand.New(rand.NewSource(0))
 
-	const iterations int = 32
-	const maxLength int = 128
+	const (
+		iterations int = 32
+		maxLength  int = 128
+	)
 
 	for i := 0; i < iterations; i++ {
 		length := r.Intn(maxLength-1) + 1
@@ -203,10 +204,8 @@ func zbarimgDecode(q *QRCode) (string, error) {
 	cmd.Stdin = bytes.NewBuffer(png)
 	cmd.Stdout = &out
 
-	err = cmd.Run()
-
-	if err != nil {
-		return "", err
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("zbarimg failed: %w", err)
 	}
 
 	return strings.TrimSuffix(strings.TrimPrefix(out.String(), "QR-Code:"), "\n"), nil

@@ -21,7 +21,7 @@ var generateCmd = &cobra.Command{
 	Long: `Generate a video from QR code images using ffmpeg.
 
 Example:
-  awesomeProjectQrFileTransfer generate -i qrcodes_directory
+  qrfiletransfer generate -i qrcodes_directory
 
 This will generate a video from all QR code images in the specified directory.
 The video will be saved in the same directory as "qrcodes_video.mp4".`,
@@ -76,7 +76,7 @@ func init() {
 	generateCmd.Flags().IntVar(&generateVideoFPS, "fps", 5, "Frames per second for the generated video (default: 2)")
 }
 
-// checkFFmpegInstalled checks if ffmpeg is installed on the system
+// checkFFmpegInstalled checks if ffmpeg is installed on the system.
 func checkFFmpegInstalled() error {
 	cmd := exec.Command("ffmpeg", "-version")
 	if err := cmd.Run(); err != nil {
@@ -85,7 +85,7 @@ func checkFFmpegInstalled() error {
 	return nil
 }
 
-// generateQRCodeVideo generates a video from QR code images using ffmpeg
+// generateQRCodeVideo generates a video from QR code images using ffmpeg.
 func generateQRCodeVideo(qrDir, videoPath string, fps int) (err error) {
 	// Get all PNG files in the QR codes directory
 	files, err := filepath.Glob(filepath.Join(qrDir, "*.png"))
@@ -105,6 +105,7 @@ func generateQRCodeVideo(qrDir, videoPath string, fps int) (err error) {
 	if err != nil {
 		return fmt.Errorf("failed to create temporary file: %w", err)
 	}
+
 	defer func() {
 		removeErr := os.Remove(tempFile.Name())
 		if removeErr != nil && err == nil {

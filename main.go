@@ -1,6 +1,6 @@
 package main
 
-import "awesomeProjectQrFileTransfer/cmd"
+import "github.com/dyammarcano/qrfiletransfer/cmd"
 
 func main() {
 	cmd.Execute()

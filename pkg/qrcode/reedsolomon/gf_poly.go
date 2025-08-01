@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	bitset "awesomeProjectQrFileTransfer/pkg/qrcode/bitset"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrcode/bitset"
 )
 
 // gfPoly is a polynomial over GF(2^8).
@@ -32,6 +32,7 @@ func newGFPolyFromData(data *bitset.Bitset) gfPoly {
 	result := gfPoly{term: make([]gfElement, numTotalBytes)}
 
 	i := numTotalBytes - 1
+
 	for j := 0; j < data.Len(); j += 8 {
 		result.term[i] = gfElement(data.ByteAt(j))
 		i--
@@ -56,6 +57,7 @@ func (e gfPoly) data(numTerms int) []byte {
 	result := make([]byte, numTerms)
 
 	i := numTerms - len(e.term)
+
 	for j := len(e.term) - 1; j >= 0; j-- {
 		result[i] = byte(e.term[j])
 		i++
@@ -161,6 +163,7 @@ func (e gfPoly) normalised() gfPoly {
 
 func (e gfPoly) string(useIndexForm bool) string {
 	var str string
+
 	numTerms := e.numTerms()
 
 	for i := numTerms - 1; i >= 0; i-- {
@@ -186,8 +189,10 @@ func (e gfPoly) string(useIndexForm bool) string {
 
 // equals returns true if e == other.
 func (e gfPoly) equals(other gfPoly) bool {
-	var minecPoly *gfPoly
-	var maxecPoly *gfPoly
+	var (
+		minecPoly *gfPoly
+		maxecPoly *gfPoly
+	)
 
 	if e.numTerms() > other.numTerms() {
 		minecPoly = &other

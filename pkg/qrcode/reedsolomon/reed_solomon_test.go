@@ -6,7 +6,7 @@ package reedsolomon
 import (
 	"testing"
 
-	bitset "awesomeProjectQrFileTransfer/pkg/qrcode/bitset"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrcode/bitset"
 )
 
 func TestGeneratorPoly(t *testing.T) {

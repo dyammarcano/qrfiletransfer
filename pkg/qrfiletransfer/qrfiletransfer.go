@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"awesomeProjectQrFileTransfer/pkg/qrcode"
-	"awesomeProjectQrFileTransfer/pkg/split"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrcode"
+	"github.com/dyammarcano/qrfiletransfer/pkg/split"
 )
 
 // QRFileTransfer handles the conversion of files to QR codes and back
@@ -137,6 +137,7 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 	if err != nil {
 		return fmt.Errorf("failed to open file: %w", err)
 	}
+
 	defer func() {
 		closeErr := file.Close()
 		if closeErr != nil && err == nil {
@@ -161,6 +162,7 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 	// Calculate number of chunks based on file size
 	// For larger files, we need more chunks to ensure each chunk is small enough for QR encoding
 	var numChunks int
+
 	switch {
 	case fileSize <= 1000:
 		// For small files, use at least 2 chunks
@@ -239,6 +241,7 @@ func (q *QRFileTransfer) FileToQRCodes(filePath string, outDir string) error {
 		// Encode the binary data as base64 string
 		encodedData := base64.StdEncoding.EncodeToString(chunkData)
 		qrContent := fmt.Sprintf("Chunk: %s\nData: %s", baseNameWithoutExt, encodedData)
+
 		qrCode, err := qrcode.New(qrContent, q.recoveryLevel)
 		if err != nil {
 			return fmt.Errorf("failed to create QR code for chunk %s: %w", chunkPath, err)
@@ -282,6 +285,7 @@ func (q *QRFileTransfer) QRCodesToFile(inDir string, outFilePath string) (err er
 	if err := os.MkdirAll(tempDir, 0755); err != nil {
 		return fmt.Errorf("failed to create temporary directory: %w", err)
 	}
+
 	defer func() {
 		removeErr := os.RemoveAll(tempDir)
 		if removeErr != nil && err == nil {
@@ -291,6 +295,7 @@ func (q *QRFileTransfer) QRCodesToFile(inDir string, outFilePath string) (err er
 
 	// Get all data files
 	dataDir := filepath.Join(inDir, "data")
+
 	dataFiles, err := filepath.Glob(filepath.Join(dataDir, "*.dat"))
 	if err != nil {
 		return fmt.Errorf("failed to list data files: %w", err)
@@ -334,6 +339,7 @@ func (q *QRFileTransfer) QRCodesToFile(inDir string, outFilePath string) (err er
 	}
 
 	var reconstructedFile string
+
 	for _, file := range files {
 		if !file.IsDir() && !strings.HasSuffix(file.Name(), ".part") && !strings.HasSuffix(file.Name(), ".tmp") {
 			reconstructedFile = filepath.Join(tempDir, file.Name())
@@ -350,6 +356,7 @@ func (q *QRFileTransfer) QRCodesToFile(inDir string, outFilePath string) (err er
 	if err != nil {
 		return fmt.Errorf("failed to open reconstructed file: %w", err)
 	}
+
 	defer func() {
 		closeErr := srcFile.Close()
 		if closeErr != nil && err == nil {
@@ -361,6 +368,7 @@ func (q *QRFileTransfer) QRCodesToFile(inDir string, outFilePath string) (err er
 	if err != nil {
 		return fmt.Errorf("failed to create output file: %w", err)
 	}
+
 	defer func() {
 		closeErr := dstFile.Close()
 		if closeErr != nil && err == nil {

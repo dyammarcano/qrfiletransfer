@@ -31,6 +31,7 @@ func MeasureTestPerformance(t *testing.T) func() {
 	t.Helper()
 
 	var mStart runtime.MemStats
+
 	runtime.ReadMemStats(&mStart)
 
 	start := time.Now()
@@ -38,6 +39,7 @@ func MeasureTestPerformance(t *testing.T) func() {
 
 	return func() {
 		var mEnd runtime.MemStats
+
 		runtime.ReadMemStats(&mEnd)
 
 		duration := time.Since(start)
@@ -107,6 +109,7 @@ Stack Statistics:
 		// Guardar perfiles pprof estándar
 		heapFile, _ := os.Create(filepath.Join(outputDir, fmt.Sprintf("%s_heap.prof", testName)))
 		_ = pprof.WriteHeapProfile(heapFile)
+
 		if err := heapFile.Close(); err != nil {
 			return
 		}
@@ -116,15 +119,18 @@ Stack Statistics:
 		if err := pprof.Lookup("goroutine").WriteTo(goroutineFile, 0); err != nil {
 			return
 		}
+
 		if err := goroutineFile.Close(); err != nil {
 			return
 		}
 
 		// Profile de asignaciones (más útil con `pprof -alloc_space`)
 		allocsFile, _ := os.Create(filepath.Join(outputDir, fmt.Sprintf("%s_allocs.prof", testName)))
+
 		if err := pprof.Lookup("allocs").WriteTo(allocsFile, 0); err != nil {
 			return
 		}
+
 		if err := allocsFile.Close(); err != nil {
 			return
 		}
@@ -138,24 +144,26 @@ Stack Statistics:
 		if err := pprof.StartCPUProfile(fCPU); err != nil {
 			return
 		}
+
 		defer func() {
 			pprof.StopCPUProfile()
+
 			if err := fCPU.Close(); err != nil {
 				return
 			}
-		}()
 
-		// Memory profile (heap)
-		defer func() {
+			// Memory profile (heap)
 			fMem, err := os.Create(filepath.Join(outputDir, "mem.prof"))
 			if err != nil {
 				t.Fatalf("could not create memory profile: %v", err)
 			}
+
 			defer func(fMem *os.File) {
 				if err := fMem.Close(); err != nil {
 					t.Fatalf("could not close memory profile: %v", err)
 				}
 			}(fMem)
+
 			_ = pprof.WriteHeapProfile(fMem)
 		}()
 	}

@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"awesomeProjectQrFileTransfer/pkg/qrfiletransfer"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrfiletransfer"
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode"
 	"github.com/spf13/cobra"
@@ -30,7 +30,7 @@ var readCmd = &cobra.Command{
 	Long: `Read QR codes from a video file and reconstruct the original file.
 
 Example:
-  awesomeProjectQrFileTransfer read -i qrcodes_video.mp4 -o reconstructed_file.txt
+  qrfiletransfer read -i qrcodes_video.mp4 -o reconstructed_file.txt
 
 This will extract frames from the video, read QR codes from the frames,
 and reconstruct the original file.`,
@@ -183,7 +183,7 @@ func init() {
 	readCmd.Flags().BoolVarP(&readKeepFrames, "keep", "k", false, "Keep extracted frames and intermediate files")
 }
 
-// extractFramesFromVideo extracts frames from a video using ffmpeg
+// extractFramesFromVideo extracts frames from a video using ffmpeg.
 func extractFramesFromVideo(videoPath, outputDir string) error {
 	// Build the ffmpeg command to extract frames
 	cmd := exec.Command(

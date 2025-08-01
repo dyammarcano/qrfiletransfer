@@ -7,7 +7,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "awesomeProjectQrFileTransfer",
+	Use:   "qrfiletransfer",
 	Short: "A tool to transfer files using QR codes",
 	Long: `QR File Transfer is a tool that allows you to transfer files using QR codes.
 

@@ -90,20 +90,25 @@ func (s *Split) SplitFile(file *os.File, outDir string, chunks int) error {
 	copy(meta.Name[:], nameBase)
 
 	var firstChunk string
+
 	for i := 0; ; i++ {
 		n, err := file.Read(buf)
 		if n > 0 {
 			chunkName := fmt.Sprintf("%s_%04d.part", strings.TrimSuffix(nameBase, filepath.Ext(nameBase)), i)
 			fullPath := filepath.Join(outDir, chunkName)
+
 			if i == 0 {
 				fullPath = strings.Replace(fullPath, "part", "tmp", 1)
 				firstChunk = fullPath
 			}
+
 			if writeErr := os.WriteFile(fullPath, buf[:n], DefaultFilePermissions); writeErr != nil {
 				return fmt.Errorf("failed to write chunk file: %w", writeErr)
 			}
+
 			hash.Write(buf[:n])
 		}
+
 		if err != nil {
 			if err == io.EOF {
 				copy(meta.Hash[:], hash.Sum(nil))
@@ -134,13 +139,17 @@ func (s *Split) MergeFile(inDir string) error {
 	}
 
 	// Extract metadata from the first chunk
-	var meta metadata
-	var foundFirstChunk bool
+	var (
+		meta            metadata
+		foundFirstChunk bool
+	)
+
 	for _, c := range chunks {
 		if c.first {
 			if err := s.extractMetadata(c.name, &meta); err != nil {
 				return fmt.Errorf("failed to extract metadata: %w", err)
 			}
+
 			foundFirstChunk = true
 			break
 		}
@@ -152,10 +161,12 @@ func (s *Split) MergeFile(inDir string) error {
 
 	// Create an output file
 	outputFileName := string(bytes.Trim(meta.Name[:], "\x00"))
+
 	outFile, err := os.Create(filepath.Join(inDir, outputFileName))
 	if err != nil {
 		return fmt.Errorf("failed to create output file: %w", err)
 	}
+
 	defer func() {
 		if closeErr := outFile.Close(); closeErr != nil {
 			// We can only log the error since we're in a deferred
@@ -222,9 +233,11 @@ func (s *Split) SplitData(v any, a []any, chunks int) error {
 	if v == nil {
 		return errors.New("input is nil")
 	}
+
 	if chunks < MinChunks {
 		return fmt.Errorf("chunks must be at least %d", MinChunks)
 	}
+
 	if len(a) != chunks {
 		return fmt.Errorf("output slice length must be %d", chunks)
 	}
@@ -234,11 +247,13 @@ func (s *Split) SplitData(v any, a []any, chunks int) error {
 	if err := gob.NewEncoder(&buf).Encode(v); err != nil {
 		return fmt.Errorf("gob encode failed: %w", err)
 	}
+
 	encodedData := buf.Bytes()
 
 	// Calculate chunk size
 	dataLength := len(encodedData)
 	partSize := dataLength / chunks
+
 	if partSize == 0 && dataLength > 0 {
 		partSize = 1
 	}
@@ -283,11 +298,13 @@ func (s *Split) MergeData(a []any, v any) error {
 
 	// Combine all chunks into a single byte slice
 	var combined []byte
+
 	for i, part := range a {
 		b, ok := part.([]byte)
 		if !ok {
 			return fmt.Errorf("chunk at index %d is not []byte", i)
 		}
+
 		combined = append(combined, b...)
 	}
 
@@ -296,7 +313,8 @@ func (s *Split) MergeData(a []any, v any) error {
 		return errors.New("no data to decode")
 	}
 
-	return gob.NewDecoder(bytes.NewReader(combined)).Decode(v)
+	dec := gob.NewDecoder(bytes.NewReader(combined))
+	return dec.Decode(v)
 }
 
 // parsedChunk represents a chunk file with its metadata
@@ -326,6 +344,7 @@ func (s *Split) injectMetadata(chunkPath string, meta *metadata) error {
 	base := filepath.Base(chunkPath)
 	baseWithoutExt := strings.TrimSuffix(base, filepath.Ext(base))
 	dstName := filepath.Join(dir, baseWithoutExt+".part")
+
 	dst, err := os.Create(dstName)
 	if err != nil {
 		return fmt.Errorf("failed to create destination file: %w", err)
@@ -395,6 +414,7 @@ func (s *Split) checkFiles(dir string) ([]parsedChunk, error) {
 		if e.IsDir() {
 			continue
 		}
+
 		name := filepath.Join(dir, e.Name())
 		m := re.FindStringSubmatch(e.Name())
 		if len(m) != 2 {

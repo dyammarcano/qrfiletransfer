@@ -315,12 +315,15 @@ func TestSymbolPenalties(t *testing.T) {
 		if test.expectedPenalty1 != -1 && test.expectedPenalty1 != penalty1 {
 			ok = false
 		}
+
 		if test.expectedPenalty2 != -1 && test.expectedPenalty2 != penalty2 {
 			ok = false
 		}
+
 		if test.expectedPenalty3 != -1 && test.expectedPenalty3 != penalty3 {
 			ok = false
 		}
+
 		if test.expectedPenalty4 != -1 && test.expectedPenalty4 != penalty4 {
 			ok = false
 		}

@@ -13,7 +13,7 @@ package reedsolomon
 import (
 	"log"
 
-	bitset "awesomeProjectQrFileTransfer/pkg/qrcode/bitset"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrcode/bitset"
 )
 
 // Encode data for QR Code 2005 using the appropriate Reed-Solomon code.

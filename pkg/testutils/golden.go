@@ -43,20 +43,22 @@ func normalizeSystemdUnitContent(content string) string {
 	for section := range sections {
 		sectionNames = append(sectionNames, section)
 	}
+
 	sort.Strings(sectionNames)
 
 	// Build the normalized content
 	var normalized strings.Builder
 	for _, section := range sectionNames {
-		normalized.WriteString(section + "\n")
+		_, _ = normalized.WriteString(section + "\n")
 
 		properties := sections[section]
 		sort.Strings(properties)
 
 		for _, property := range properties {
-			normalized.WriteString(property + "\n")
+			_, _ = normalized.WriteString(property + "\n")
 		}
-		normalized.WriteString("\n")
+
+		_, _ = normalized.WriteString("\n")
 	}
 
 	return normalized.String()
@@ -82,6 +84,7 @@ func CompareWithGoldenFile(t *testing.T, goldenFilePath string, actualContent st
 			t.Fatalf("Failed to update golden file: %v", err)
 			return false
 		}
+
 		t.Logf("Updated golden file: %s", goldenFilePath)
 		return true
 	}

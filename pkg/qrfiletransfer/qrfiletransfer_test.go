@@ -12,6 +12,7 @@ func TestQRFileTransfer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temporary directory: %v", err)
 	}
+
 	defer func() {
 		if err := os.RemoveAll(testDir); err != nil {
 			t.Errorf("Failed to remove test directory: %v", err)
@@ -58,6 +59,7 @@ func TestQRFileTransfer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to list QR code files: %v", err)
 	}
+
 	if len(qrFiles) == 0 {
 		t.Fatal("No QR code files were created")
 	}
@@ -66,6 +68,7 @@ func TestQRFileTransfer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to list data files: %v", err)
 	}
+
 	if len(dataFiles) == 0 {
 		t.Fatal("No data files were created")
 	}

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"testing"
 
-	bitset "awesomeProjectQrFileTransfer/pkg/qrcode/bitset"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrcode/bitset"
 )
 
 func TestBuildRegularSymbol(t *testing.T) {
@@ -19,13 +19,10 @@ func TestBuildRegularSymbol(t *testing.T) {
 			data.AppendNumBools(8, false)
 		}
 
-		s, err := buildRegularSymbol(*v, k, data, false)
+		_, err := buildRegularSymbol(*v, k, data, false)
 
 		if err != nil {
 			fmt.Println(err.Error())
-		} else {
-			_ = s
-			// fmt.Print(m.string())
 		}
 	}
 }

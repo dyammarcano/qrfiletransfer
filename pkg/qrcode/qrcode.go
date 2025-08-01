@@ -59,8 +59,8 @@ import (
 	"log"
 	"os"
 
-	bitset "awesomeProjectQrFileTransfer/pkg/qrcode/bitset"
-	reedsolomon "awesomeProjectQrFileTransfer/pkg/qrcode/reedsolomon"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrcode/bitset"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrcode/reedsolomon"
 )
 
 // Encode a QR Code and return a raw PNG image.
@@ -106,9 +106,7 @@ func WriteFile(content string, level RecoveryLevel, size int, filename string) e
 // size is both the image width and height in pixels. If size is too small then
 // a larger image is silently written. Negative values for size cause a variable
 // sized image to be written: See the documentation for Image().
-func WriteColorFile(content string, level RecoveryLevel, size int, background,
-	foreground color.Color, filename string) error {
-
+func WriteColorFile(content string, level RecoveryLevel, size int, background, foreground color.Color, filename string) error {
 	var q *QRCode
 
 	q, err := New(content, level)
@@ -157,10 +155,12 @@ func New(content string, level RecoveryLevel) (*QRCode, error) {
 	encoders := []dataEncoderType{dataEncoderType1To9, dataEncoderType10To26,
 		dataEncoderType27To40}
 
-	var encoder *dataEncoder
-	var encoded *bitset.Bitset
-	var chosenVersion *qrCodeVersion
-	var err error
+	var (
+		encoder       *dataEncoder
+		encoded       *bitset.Bitset
+		chosenVersion *qrCodeVersion
+		err           error
+	)
 
 	for _, t := range encoders {
 		encoder = newDataEncoder(t)
@@ -342,10 +342,8 @@ func (q *QRCode) PNG(size int) ([]byte, error) {
 	encoder := png.Encoder{CompressionLevel: png.BestCompression}
 
 	var b bytes.Buffer
-	err := encoder.Encode(&b, img)
-
-	if err != nil {
-		return nil, err
+	if err := encoder.Encode(&b, img); err != nil {
+		return nil, fmt.Errorf("png.Encode: %w", err)
 	}
 
 	return b.Bytes(), nil
@@ -364,6 +362,7 @@ func (q *QRCode) Write(size int, out io.Writer) error {
 	if err != nil {
 		return err
 	}
+
 	_, err = out.Write(p)
 	return err
 }
@@ -397,11 +396,14 @@ func (q *QRCode) encode() {
 	encoded := q.encodeBlocks()
 
 	const numMasks int = 8
+
 	penalty := 0
 
 	for mask := 0; mask < numMasks; mask++ {
-		var s *symbol
-		var err error
+		var (
+			s   *symbol
+			err error
+		)
 
 		s, err = buildRegularSymbol(q.version, mask, encoded, !q.DisableBorder)
 
@@ -411,8 +413,7 @@ func (q *QRCode) encode() {
 
 		numEmptyModules := s.numEmptyModules()
 		if numEmptyModules != 0 {
-			log.Panicf("bug: numEmptyModules is %d (expected 0) (version=%d)",
-				numEmptyModules, q.VersionNumber)
+			log.Panicf("bug: numEmptyModules is %d (expected 0) (version=%d)", numEmptyModules, q.VersionNumber)
 		}
 
 		p := s.penaltyScore()
@@ -449,21 +450,23 @@ func (q *QRCode) encodeBlocks() *bitset.Bitset {
 		ecStartOffset int
 	}
 
-	block := make([]dataBlock, q.version.numBlocks())
+	dataBlocks := make([]dataBlock, q.version.numBlocks())
 
-	start := 0
-	end := 0
-	blockID := 0
+	var (
+		end     int
+		start   int
+		blockID int
+	)
 
 	for _, b := range q.version.block {
 		for j := 0; j < b.numBlocks; j++ {
 			start = end
 			end = start + b.numDataCodewords*8
 
-			// Apply error correction to each block.
+			// Apply error correction to each dataBlocks.
 			numErrorCodewords := b.numCodewords - b.numDataCodewords
-			block[blockID].data = reedsolomon.Encode(q.data.Substr(start, end), numErrorCodewords)
-			block[blockID].ecStartOffset = end - start
+			dataBlocks[blockID].data = reedsolomon.Encode(q.data.Substr(start, end), numErrorCodewords)
+			dataBlocks[blockID].ecStartOffset = end - start
 
 			blockID++
 		}
@@ -478,8 +481,8 @@ func (q *QRCode) encodeBlocks() *bitset.Bitset {
 	for i := 0; working; i += 8 {
 		working = false
 
-		for j, b := range block {
-			if i >= block[j].ecStartOffset {
+		for j, b := range dataBlocks {
+			if i >= dataBlocks[j].ecStartOffset {
 				continue
 			}
 
@@ -494,9 +497,9 @@ func (q *QRCode) encodeBlocks() *bitset.Bitset {
 	for i := 0; working; i += 8 {
 		working = false
 
-		for j, b := range block {
-			offset := i + block[j].ecStartOffset
-			if offset >= block[j].data.Len() {
+		for j, b := range dataBlocks {
+			offset := i + dataBlocks[j].ecStartOffset
+			if offset >= dataBlocks[j].data.Len() {
 				continue
 			}
 
@@ -554,7 +557,9 @@ func (q *QRCode) addPadding() {
 // ToString produces a multi-line string that forms a QR-code image.
 func (q *QRCode) ToString(inverseColor bool) string {
 	bits := q.Bitmap()
+
 	var buf bytes.Buffer
+
 	for y := range bits {
 		for x := range bits[y] {
 			if bits[y][x] != inverseColor {
@@ -563,6 +568,7 @@ func (q *QRCode) ToString(inverseColor bool) string {
 				buf.WriteString("██")
 			}
 		}
+
 		buf.WriteString("\n")
 	}
 	return buf.String()
@@ -572,6 +578,7 @@ func (q *QRCode) ToString(inverseColor bool) string {
 // factor two smaller in x and y then ToString.
 func (q *QRCode) ToSmallString(inverseColor bool) string {
 	bits := q.Bitmap()
+
 	var buf bytes.Buffer
 	// if there is an odd number of rows, the last one needs special treatment
 	for y := 0; y < len(bits)-1; y += 2 {
@@ -590,8 +597,10 @@ func (q *QRCode) ToSmallString(inverseColor bool) string {
 				}
 			}
 		}
+
 		buf.WriteString("\n")
 	}
+
 	// special treatment for the last row if odd
 	if len(bits)%2 == 1 {
 		y := len(bits) - 1
@@ -602,6 +611,7 @@ func (q *QRCode) ToSmallString(inverseColor bool) string {
 				buf.WriteString("▀")
 			}
 		}
+
 		buf.WriteString("\n")
 	}
 	return buf.String()

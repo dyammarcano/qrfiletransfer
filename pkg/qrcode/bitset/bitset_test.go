@@ -4,7 +4,7 @@
 package bitset
 
 import (
-	rand "math/rand"
+	"math/rand"
 	"testing"
 )
 
@@ -90,6 +90,7 @@ func TestAppendByte(t *testing.T) {
 
 	for _, test := range tests {
 		test.initial.AppendByte(test.value, test.numBits)
+
 		if !equal(test.initial.Bits(), test.expected.Bits()) {
 			t.Errorf("Got %v, expected %v", test.initial.Bits(),
 				test.expected.Bits())
@@ -142,6 +143,7 @@ func TestAppendUint32(t *testing.T) {
 
 	for _, test := range tests {
 		test.initial.AppendUint32(test.value, test.numBits)
+
 		if !equal(test.initial.Bits(), test.expected.Bits()) {
 			t.Errorf("Got %v, expected %v", test.initial.Bits(),
 				test.expected.Bits())

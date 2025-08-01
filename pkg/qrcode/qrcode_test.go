@@ -105,10 +105,12 @@ func TestQRCodeVersionCapacity(t *testing.T) {
 		alphanumericData := strings.Repeat("A", test.maxAlphanumeric)
 		byteData := strings.Repeat("#", test.maxByte)
 
-		var n *QRCode
-		var a *QRCode
-		var b *QRCode
-		var err error
+		var (
+			n   *QRCode
+			a   *QRCode
+			b   *QRCode
+			err error
+		)
 
 		n, err = New(numericData, test.level)
 		if err != nil {

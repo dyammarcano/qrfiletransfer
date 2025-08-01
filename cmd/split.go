@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"awesomeProjectQrFileTransfer/pkg/qrcode"
-	"awesomeProjectQrFileTransfer/pkg/qrfiletransfer"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrcode"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrfiletransfer"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +26,7 @@ var splitCmd = &cobra.Command{
 	Long: `Split a file into multiple QR code images stored in an output directory.
 
 Example:
-  awesomeProjectQrFileTransfer split -i myfile.txt -o output_directory
+  qrfiletransfer split -i myfile.txt -o output_directory
 
 This will split myfile.txt into multiple QR code images and store them in output_directory.
 The QR codes can later be joined back into the original file using the join command.`,
@@ -112,7 +112,7 @@ func init() {
 	splitCmd.Flags().StringVarP(&splitInputFile, "input", "i", "", "Input file to split (required)")
 	splitCmd.Flags().StringVarP(&splitOutputDir, "output", "o", "", "Output directory for QR codes (default: <filename>_qrcodes)")
 	splitCmd.Flags().IntVarP(&qrSize, "size", "s", 0, "QR code size in pixels (default: 800)")
-	splitCmd.Flags().IntVar(&minQRSize, "minV-size", 0, "Minimum QR code size in pixels (default: 400)")
+	splitCmd.Flags().IntVar(&minQRSize, "min-size", 0, "Minimum QR code size in pixels (default: 400)")
 	splitCmd.Flags().IntVar(&maxQRSize, "max-size", 0, "Maximum QR code size in pixels (default: 1600)")
 	splitCmd.Flags().BoolVar(&autoAdjustSize, "auto-adjust", true, "Automatically adjust QR code size based on data size")
 	splitCmd.Flags().StringVarP(&recoveryLevel, "recovery", "r", "medium", "QR code recovery level (low, medium, high, highest)")

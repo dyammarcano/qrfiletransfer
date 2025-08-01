@@ -1,0 +1,56 @@
+# https://github.com/golangci/golangci-lint/blob/main/.golangci.yml
+
+version: "2"
+
+run:
+  timeout: 2m
+
+linters-settings:
+  revive:
+    rules:
+      - name: package-comments
+        disabled: true
+      - name: unnecessary-init
+        disabled: true
+      - name: var-declaration
+        disabled: true
+      - name: builtin-shadow
+        disabled: true
+      - name: varnamelen
+        arguments: [1]
+
+linters:
+  default: all
+  enable:
+    - govet
+    - errcheck
+    - bodyclose
+    - copyloopvar
+    - depguard
+    - dogsled
+    - dupl
+    - errorlint
+    - funlen
+    - gocheckcompilerdirectives
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - godox
+    - mnd
+    - goprintffuncname
+    - gosec
+    - intrange
+    - ineffassign
+    - lll
+    - misspell
+    - nakedret
+    - noctx
+    - nolintlint
+    - revive
+    - staticcheck
+    - testifylint
+    - unconvert
+    - unparam
+    - unused
+    - whitespace

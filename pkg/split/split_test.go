@@ -12,6 +12,7 @@ const testDataDir = "../../testdata"
 
 func TestNewSplit(t *testing.T) {
 	s := NewSplit()
+
 	file, err := os.Open(filepath.Join(testDataDir, "night.city_cars.jpg"))
 	if err != nil {
 		t.Fatal(err)

@@ -7,7 +7,7 @@ import (
 	"errors"
 	"log"
 
-	bitset "awesomeProjectQrFileTransfer/pkg/qrcode/bitset"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrcode/bitset"
 )
 
 // Data encoding.
@@ -180,13 +180,15 @@ func (d *dataEncoder) encode(data []byte) (*bitset.Bitset, error) {
 		return nil, err
 	}
 
-	// Check if a single byte encoded segment would be more efficient.
+	// Check if a single byte-encoded segment would be more efficient.
 	optimizedLength := 0
+
 	for _, s := range d.optimised {
 		length, err := d.encodedLength(s.dataMode, len(s.data))
 		if err != nil {
 			return nil, err
 		}
+
 		optimizedLength += length
 	}
 
@@ -218,11 +220,13 @@ func (d *dataEncoder) encode(data []byte) (*bitset.Bitset, error) {
 // dataModeNone < dataModeNumeric < dataModeAlphanumeric < dataModeByte
 func (d *dataEncoder) classifyDataModes() dataMode {
 	var start int
+
 	mode := dataModeNone
 	highestRequiredMode := mode
 
 	for i, v := range d.data {
 		var newMode dataMode
+
 		switch {
 		case v >= 0x30 && v <= 0x39:
 			newMode = dataModeNumeric
@@ -336,6 +340,7 @@ func (d *dataEncoder) encodeDataRaw(data []byte, dataMode dataMode, encoded *bit
 			charsRemaining := len(data) - i
 
 			var value uint32
+
 			bitsUsed := 1
 
 			for j := 0; j < charsRemaining && j < 3; j++ {
@@ -343,6 +348,7 @@ func (d *dataEncoder) encodeDataRaw(data []byte, dataMode dataMode, encoded *bit
 				value += uint32(data[i+j] - 0x30)
 				bitsUsed += 3
 			}
+
 			encoded.AppendUint32(value, bitsUsed)
 		}
 	case dataModeAlphanumeric:

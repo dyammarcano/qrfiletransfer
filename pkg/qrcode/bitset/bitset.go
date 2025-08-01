@@ -66,6 +66,7 @@ func (b *Bitset) Substr(start int, end int) *Bitset {
 		if b.At(i) {
 			result.bits[result.numBits/8] |= 0x80 >> uint(result.numBits%8)
 		}
+
 		result.numBits++
 	}
 
@@ -166,6 +167,7 @@ func (b *Bitset) Append(other *Bitset) {
 		if other.At(i) {
 			b.bits[b.numBits/8] |= 0x80 >> uint(b.numBits%8)
 		}
+
 		b.numBits++
 	}
 }
@@ -178,6 +180,7 @@ func (b *Bitset) AppendBools(bits ...bool) {
 		if v {
 			b.bits[b.numBits/8] |= 0x80 >> uint(b.numBits%8)
 		}
+
 		b.numBits++
 	}
 }

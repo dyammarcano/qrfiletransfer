@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"awesomeProjectQrFileTransfer/pkg/split"
+	"github.com/dyammarcano/qrfiletransfer/pkg/split"
 )
 
 func TestSplitPackage(t *testing.T) {
@@ -14,6 +14,7 @@ func TestSplitPackage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temporary directory: %v", err)
 	}
+
 	defer func() {
 		if err := os.RemoveAll(testDir); err != nil {
 			t.Errorf("Failed to remove test directory: %v", err)
@@ -46,6 +47,7 @@ func TestSplitPackage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to open test file: %v", err)
 	}
+
 	defer func() {
 		if err := file.Close(); err != nil {
 			t.Errorf("Failed to close file: %v", err)

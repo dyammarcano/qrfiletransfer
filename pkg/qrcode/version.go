@@ -6,10 +6,10 @@ package qrcode
 import (
 	"log"
 
-	bitset "awesomeProjectQrFileTransfer/pkg/qrcode/bitset"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrcode/bitset"
 )
 
-// Error detection/recovery capacity.
+// RecoveryLevel Error detection/recovery capacity.
 //
 // There are several levels of error detection/recovery capacity. Higher levels
 // of error recovery are able to correct more errors, with the trade-off of
@@ -17,16 +17,16 @@ import (
 type RecoveryLevel int
 
 const (
-	// Level L: 7% error recovery.
+	// Low Level L: 7% error recovery.
 	Low RecoveryLevel = iota
 
-	// Level M: 15% error recovery. Good default choice.
+	// Medium Level M: 15% error recovery. Good default choice.
 	Medium
 
-	// Level Q: 25% error recovery.
+	// High Level Q: 25% error recovery.
 	High
 
-	// Level H: 30% error recovery.
+	// Highest Level H: 30% error recovery.
 	Highest
 )
 
@@ -2968,11 +2968,12 @@ func chooseQRCodeVersion(level RecoveryLevel, encoder *dataEncoder, numDataBits 
 	var chosenVersion *qrCodeVersion
 
 	for _, v := range versions {
-		if v.level != level {
+		switch {
+		case v.level != level:
 			continue
-		} else if v.version < encoder.minVersion {
+		case v.version < encoder.minVersion:
 			continue
-		} else if v.version > encoder.maxVersion {
+		case v.version > encoder.maxVersion:
 			break
 		}
 

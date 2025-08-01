@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"awesomeProjectQrFileTransfer/pkg/qrfiletransfer"
+	"github.com/dyammarcano/qrfiletransfer/pkg/qrfiletransfer"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +21,7 @@ var joinCmd = &cobra.Command{
 	Long: `Join QR code images from an input directory back into the original file.
 
 Example:
-  awesomeProjectQrFileTransfer join -i input_directory -o output_file.txt
+  qrfiletransfer join -i input_directory -o output_file.txt
 
 This will join the QR code images in input_directory back into the original file
 and save it as output_file.txt.`,
@@ -35,7 +35,7 @@ and save it as output_file.txt.`,
 			os.Exit(1)
 		}
 
-		// Check if input directory exists
+		// Check if the input directory exists
 		if _, err := os.Stat(joinInputDir); os.IsNotExist(err) {
 			fmt.Printf("Error: input directory '%s' does not exist\n", joinInputDir)
 			os.Exit(1)

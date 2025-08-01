@@ -12,6 +12,7 @@ func TestSimpleFileCreation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temporary directory: %v", err)
 	}
+
 	defer func() {
 		if err := os.RemoveAll(testDir); err != nil {
 			t.Errorf("Failed to remove test directory: %v", err)

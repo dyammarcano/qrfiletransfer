@@ -109,7 +109,7 @@ func (m *symbol) bitmap() [][]bool {
 	module := make([][]bool, len(m.module))
 
 	for i := range m.module {
-		module[i] = m.module[i][:]
+		module[i] = m.module[i]
 	}
 
 	return module
