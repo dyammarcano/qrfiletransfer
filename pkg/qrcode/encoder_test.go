@@ -351,9 +351,7 @@ func TestOptimiseEncoding(t *testing.T) {
 
 		encoder := newDataEncoder(test.dataEncoderType)
 
-		_, err := encoder.encode(data)
-
-		if err != nil {
+		if _, err := encoder.encode(data); err != nil {
 			t.Errorf("Got %s, expected valid encoding", err.Error())
 		} else {
 			ok := true
@@ -382,13 +380,13 @@ func TestOptimiseEncoding(t *testing.T) {
 func testModeSegmentsString(segments []testModeSegment) string {
 	result := "["
 
-	for i, segment := range segments {
+	for i, seg := range segments {
 		if i > 0 {
 			result += ", "
 		}
 
-		result += fmt.Sprintf("%d*%s", segment.numChars,
-			dataModeString(segment.dataMode))
+		result += fmt.Sprintf("%d*%s", seg.numChars,
+			dataModeString(seg.dataMode))
 	}
 
 	result += "]"
@@ -399,13 +397,13 @@ func testModeSegmentsString(segments []testModeSegment) string {
 func segmentsString(segments []segment) string {
 	result := "["
 
-	for i, segment := range segments {
+	for i, seg := range segments {
 		if i > 0 {
 			result += ", "
 		}
 
-		result += fmt.Sprintf("%d*%s", len(segment.data),
-			dataModeString(segment.dataMode))
+		result += fmt.Sprintf("%d*%s", len(seg.data),
+			dataModeString(seg.dataMode))
 	}
 
 	result += "]"

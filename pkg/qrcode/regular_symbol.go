@@ -4,6 +4,8 @@
 package qrcode
 
 import (
+	"errors"
+
 	"github.com/dyammarcano/qrfiletransfer/pkg/qrcode/bitset"
 )
 
@@ -125,9 +127,9 @@ func buildRegularSymbol(version qrCodeVersion, mask int, data *bitset.Bitset, in
 	m.addFormatInfo()
 	m.addVersionInfo()
 
-	ok, err := m.addData()
+	ok := m.addData()
 	if !ok {
-		return nil, err
+		return nil, errors.New("failed to add data to QR code")
 	}
 
 	return m.symbol, nil
@@ -239,7 +241,7 @@ const (
 	down
 )
 
-func (m *regularSymbol) addData() (bool, error) {
+func (m *regularSymbol) addData() bool {
 	xOffset := 1
 	dir := up
 
@@ -309,5 +311,5 @@ func (m *regularSymbol) addData() (bool, error) {
 		}
 	}
 
-	return true, nil
+	return true
 }

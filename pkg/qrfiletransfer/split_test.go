@@ -28,6 +28,7 @@ func TestSplitPackage(t *testing.T) {
 
 	// Create a test file
 	testFilePath := filepath.Join(testDir, "test.txt")
+
 	testContent := "This is a test file for the split package. It contains some text that will be split into chunks."
 	if err := os.WriteFile(testFilePath, []byte(testContent), 0644); err != nil {
 		t.Fatalf("Failed to create test file: %v", err)

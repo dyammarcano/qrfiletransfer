@@ -17,7 +17,6 @@ func TestSymbolBasic(t *testing.T) {
 
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
-
 			v := m.get(i, j)
 
 			if v != false {

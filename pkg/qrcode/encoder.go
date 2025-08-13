@@ -281,19 +281,16 @@ func (d *dataEncoder) optimiseDataModes() error {
 			}
 
 			coalescedLength, err := d.encodedLength(mode, numChars+nextNumChars)
-
 			if err != nil {
 				return err
 			}
 
 			seperateLength1, err := d.encodedLength(mode, numChars)
-
 			if err != nil {
 				return err
 			}
 
 			seperateLength2, err := d.encodedLength(nextMode, nextNumChars)
-
 			if err != nil {
 				return err
 			}
@@ -372,6 +369,8 @@ func (d *dataEncoder) encodeDataRaw(data []byte, dataMode dataMode, encoded *bit
 		for _, b := range data {
 			encoded.AppendByte(b, 8)
 		}
+	default:
+		log.Panicf("encodeDataRaw() with unsupported data mode %s.", dataModeString(dataMode))
 	}
 }
 

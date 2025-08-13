@@ -121,9 +121,7 @@ func TestDecodeAllCharacters(t *testing.T) {
 		t.Error(err.Error())
 	}
 
-	err = zbarimgCheck(q)
-
-	if err != nil {
+	if err = zbarimgCheck(q); err != nil {
 		t.Error(err.Error())
 	}
 }
@@ -156,9 +154,7 @@ func TestDecodeFuzz(t *testing.T) {
 				t.Error(err.Error())
 			}
 
-			err = zbarimgCheck(q)
-
-			if err != nil {
+			if err = zbarimgCheck(q); err != nil {
 				t.Error(err.Error())
 			}
 		}

@@ -12,5 +12,13 @@ tasks:
 
   upgrade:
     cmds:
-      - go mod tidy -v
       - go get -u ./...
+      - go mod tidy -v
+
+  build-dev:
+    cmds:
+      - goreleaser build --snapshot --clean
+
+  build-prod:
+    cmds:
+      - goreleaser --snapshot --skip-publish --rm-dist

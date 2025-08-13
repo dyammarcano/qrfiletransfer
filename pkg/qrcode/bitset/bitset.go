@@ -195,6 +195,7 @@ func (b *Bitset) AppendNumBools(num int, value bool) {
 // String returns a human readable representation of the Bitset's contents.
 func (b *Bitset) String() string {
 	var bitString string
+
 	for i := 0; i < b.numBits; i++ {
 		if (i % 8) == 0 {
 			bitString += " "

@@ -37,18 +37,14 @@ func TestQRCodeMaxCapacity(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		_, err := New(strings.Repeat(test.string, test.numRepetitions), Low)
-
-		if err != nil {
+		if _, err := New(strings.Repeat(test.string, test.numRepetitions), Low); err != nil {
 			t.Errorf("%d x '%s' got %s expected success", test.numRepetitions,
 				test.string, err.Error())
 		}
 	}
 
 	for _, test := range tests {
-		_, err := New(strings.Repeat(test.string, test.numRepetitions+1), Low)
-
-		if err == nil {
+		if _, err := New(strings.Repeat(test.string, test.numRepetitions+1), Low); err == nil {
 			t.Errorf("%d x '%s' chars encodable, expected not encodable",
 				test.numRepetitions+1, test.string)
 		}
@@ -128,29 +124,25 @@ func TestQRCodeVersionCapacity(t *testing.T) {
 		}
 
 		if n.VersionNumber != test.version {
-			t.Fatalf("Test #%d numeric has version #%d, expected #%d", i,
-				n.VersionNumber, test.version)
+			t.Fatalf("Test #%d numeric has version #%d, expected #%d", i, n.VersionNumber, test.version)
 		}
 
 		if a.VersionNumber != test.version {
-			t.Fatalf("Test #%d alphanumeric has version #%d, expected #%d", i,
-				a.VersionNumber, test.version)
+			t.Fatalf("Test #%d alphanumeric has version #%d, expected #%d", i, a.VersionNumber, test.version)
 		}
 
 		if b.VersionNumber != test.version {
-			t.Fatalf("Test #%d byte has version #%d, expected #%d", i,
-				b.VersionNumber, test.version)
+			t.Fatalf("Test #%d byte has version #%d, expected #%d", i, b.VersionNumber, test.version)
 		}
 	}
 }
 
 func TestQRCodeISOAnnexIExample(t *testing.T) {
 	var q *QRCode
-	q, err := New("01234567", Medium)
 
+	q, err := New("01234567", Medium)
 	if err != nil {
-		t.Fatalf("Error producing ISO Annex I Example: %s, expected success",
-			err.Error())
+		t.Fatalf("Error producing ISO Annex I Example: %s, expected success", err.Error())
 	}
 
 	q.encode()
@@ -158,15 +150,13 @@ func TestQRCodeISOAnnexIExample(t *testing.T) {
 	const expectedMask int = 2
 
 	if q.mask != 2 {
-		t.Errorf("ISO Annex I example mask got %d, expected %d\n", q.mask,
-			expectedMask)
+		t.Errorf("ISO Annex I example mask got %d, expected %d\n", q.mask, expectedMask)
 	}
 }
 
 func BenchmarkQRCodeURLSize(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		_, err := New("https://www.example.org", Medium)
-		if err != nil {
+		if _, err := New("https://www.example.org", Medium); err != nil {
 			b.Fatalf("Failed to create QR code: %v", err)
 		}
 	}
@@ -175,8 +165,7 @@ func BenchmarkQRCodeURLSize(b *testing.B) {
 func BenchmarkQRCodeMaximumSize(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		// 7089 is the maximum encodable number of numeric digits.
-		_, err := New(strings.Repeat("0", 7089), Low)
-		if err != nil {
+		if _, err := New(strings.Repeat("0", 7089), Low); err != nil {
 			b.Fatalf("Failed to create QR code: %v", err)
 		}
 	}

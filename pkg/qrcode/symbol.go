@@ -77,6 +77,7 @@ func (m *symbol) empty(x int, y int) bool {
 // been set (to either true or false), the number of empty modules is zero.
 func (m *symbol) numEmptyModules() int {
 	var count int
+
 	for y := 0; y < m.symbolSize; y++ {
 		for x := 0; x < m.symbolSize; x++ {
 			if !m.isUsed[y+m.quietZoneSize][x+m.quietZoneSize] {
@@ -214,12 +215,8 @@ func (m *symbol) penalty2() int {
 
 	for y := 1; y < m.symbolSize; y++ {
 		for x := 1; x < m.symbolSize; x++ {
-			topLeft := m.get(x-1, y-1)
-			above := m.get(x, y-1)
-			left := m.get(x-1, y)
 			current := m.get(x, y)
-
-			if current == left && current == above && current == topLeft {
+			if current == m.get(x-1, y) && current == m.get(x, y-1) && current == m.get(x-1, y-1) {
 				penalty++
 			}
 		}

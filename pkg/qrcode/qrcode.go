@@ -75,7 +75,6 @@ func Encode(content string, level RecoveryLevel, size int) ([]byte, error) {
 	var q *QRCode
 
 	q, err := New(content, level)
-
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +91,6 @@ func WriteFile(content string, level RecoveryLevel, size int, filename string) e
 	var q *QRCode
 
 	q, err := New(content, level)
-
 	if err != nil {
 		return err
 	}
@@ -116,13 +114,12 @@ func WriteColorFile(
 	var q *QRCode
 
 	q, err := New(content, level)
-
-	q.BackgroundColor = background
-	q.ForegroundColor = foreground
-
 	if err != nil {
 		return err
 	}
+
+	q.BackgroundColor = background
+	q.ForegroundColor = foreground
 
 	return q.WriteFile(size, filename)
 }
@@ -170,8 +167,8 @@ func New(content string, level RecoveryLevel) (*QRCode, error) {
 
 	for _, t := range encoders {
 		encoder = newDataEncoder(t)
-		encoded, err = encoder.encode([]byte(content))
 
+		encoded, err = encoder.encode([]byte(content))
 		if err != nil {
 			continue
 		}
@@ -227,8 +224,8 @@ func NewWithForcedVersion(content string, version int, level RecoveryLevel) (*QR
 	}
 
 	var encoded *bitset.Bitset
-	encoded, err := encoder.encode([]byte(content))
 
+	encoded, err := encoder.encode([]byte(content))
 	if err != nil {
 		return nil, err
 	}
@@ -366,7 +363,6 @@ func (q *QRCode) Write(size int, out io.Writer) error {
 	var p []byte
 
 	p, err := q.PNG(size)
-
 	if err != nil {
 		return err
 	}
@@ -387,7 +383,6 @@ func (q *QRCode) WriteFile(size int, filename string) error {
 	var p []byte
 
 	p, err := q.PNG(size)
-
 	if err != nil {
 		return err
 	}
@@ -421,7 +416,6 @@ func (q *QRCode) encode() {
 		)
 
 		s, err = buildRegularSymbol(q.version, mask, encoded, !q.DisableBorder)
-
 		if err != nil {
 			log.Panic(err.Error())
 		}

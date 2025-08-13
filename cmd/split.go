@@ -109,15 +109,11 @@ func init() {
 	rootCmd.AddCommand(splitCmd)
 
 	// Add flags
-	splitCmd.Flags().StringVarP(&splitInputFile, "input", "i", "",
-		"Input file to split (required)")
-	splitCmd.Flags().StringVarP(&splitOutputDir, "output", "o", "",
-		"Output directory for QR codes (default: <filename>_qrcodes)")
+	splitCmd.Flags().StringVarP(&splitInputFile, "input", "i", "", "Input file to split (required)")
+	splitCmd.Flags().StringVarP(&splitOutputDir, "output", "o", "", "Output directory for QR codes (default: <filename>_qrcodes)")
 	splitCmd.Flags().IntVarP(&qrSize, "size", "s", 0, "QR code size in pixels (default: 800)")
 	splitCmd.Flags().IntVar(&minQRSize, "min-size", 0, "Minimum QR code size in pixels (default: 400)")
 	splitCmd.Flags().IntVar(&maxQRSize, "max-size", 0, "Maximum QR code size in pixels (default: 1600)")
-	splitCmd.Flags().BoolVar(&autoAdjustSize, "auto-adjust", true,
-		"Automatically adjust QR code size based on data size")
-	splitCmd.Flags().StringVarP(&recoveryLevel, "recovery", "r", "medium",
-		"QR code recovery level (low, medium, high, highest)")
+	splitCmd.Flags().BoolVar(&autoAdjustSize, "auto-adjust", true, "Automatically adjust QR code size based on data size")
+	splitCmd.Flags().StringVarP(&recoveryLevel, "recovery", "r", "medium", "QR code recovery level (low, medium, high, highest)")
 }

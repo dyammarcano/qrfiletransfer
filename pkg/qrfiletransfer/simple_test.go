@@ -32,6 +32,7 @@ func TestSimpleFileCreation(t *testing.T) {
 
 	// Create a file in the subdirectory
 	filePath := filepath.Join(subDir, "test.txt")
+
 	content := "This is a test file."
 	if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
 		t.Fatalf("Failed to create file: %v", err)

@@ -219,11 +219,11 @@ func (s *Split) MergeFile(inDir string) error {
 	// Remove chunk files after a successful merge
 	for _, c := range chunks {
 		if err := os.Remove(c.name); err != nil {
-			fmt.Printf("Warning: failed to remove chunk file %s: %v\n", c.name, err)
+			_, _ = fmt.Fprintf(os.Stdout, "Warning: failed to remove chunk file %s: %v\n", c.name, err)
 		}
 	}
 
-	fmt.Printf("Merge successful. File saved as: %s\n", outputFileName)
+	_, _ = fmt.Fprintf(os.Stdout, "Merge successful. File saved as: %s\n\n", outputFileName)
 
 	return nil
 }
